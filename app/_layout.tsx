@@ -1,39 +1,75 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import {Slot, SplashScreen, Stack} from "expo-router";
+import React, {useEffect} from "react";
+import {StatusBar} from "expo-status-bar";
+import {ConnectionChecker} from "@/components/ConnectionChecker";
+import Toast from 'react-native-toast-message';
+import StoreProvider from "@/providers/StoreProvider";
+import {Text, View} from "react-native";
+import {KeyStoreProvider} from "@/providers/KeyStoreProvider";
+import baseTheme from "@/themes/baseTheme";
+import { Button, createTheme, ThemeProvider } from '@rneui/themed';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useThemeMode } from '@rneui/themed';
+import {ThemeModeProvider} from "@/providers/ThemeModeProvider";
+import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+const RootLayout = () => {
+    SplashScreen.preventAutoHideAsync();
+    setTimeout(SplashScreen.hideAsync, 3000);
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+    const migrateDbIfNeeded = async (db: any) => {
+        await db.execAsync(`
+        PRAGMA journal_mode = WAL;
+        CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY NOT NULL, value TEXT NOT NULL, dialogId VARCHAR KET);
+      `);
+    };
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    function CustomErrorFallback({ error, retry }: { error: Error; retry: () => void }) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Something went wrong:</Text>
+                <Text>{error.message}</Text>
+                <Button title="Retry" onPress={retry} />
+            </View>
+        );
     }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
-}
+    // const theme = createTheme({
+    //     lightColors: {
+    //         ...Platform.select({
+    //             default: lightColors.platform.android,
+    //             ios: lightColors.platform.ios,
+    //         }),
+    //     },
+    // });
+
+    return (
+        <ThemeModeProvider>
+            <StoreProvider>
+                <KeyStoreProvider>
+                    {/*<PushNotificationProvider>*/}
+                        {/*<SQLiteProvider databaseName="test.db" onInit={migrateDbIfNeeded} useSuspense>*/}
+                            {/*<WebSocketProvider>*/}
+                            {/*    <Wrap>*/}
+                                    {/*<ErrorBoundary FallbackComponent={CustomErrorFallback}>*/}
+
+                                    {/*<ConnectionChecker />*/}
+                                    <Stack>
+                                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                        <Stack.Screen name="+not-found" />
+                                    </Stack>
+
+                                    {/*</ErrorBoundary>*/}
+                            {/*    </Wrap>*/}
+                            {/*</WebSocketProvider>*/}
+                        {/*</SQLiteProvider>*/}
+                    {/*</PushNotificationProvider>*/}
+                </KeyStoreProvider>
+            </StoreProvider>
+        </ThemeModeProvider>
+
+    );
+};
+
+export default RootLayout;

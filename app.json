@@ -5,8 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "expo-react-chess",
     "userInterfaceStyle": "automatic",
+    "platforms": [
+      "android"
+    ],
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -15,15 +18,15 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      },
+      "hermes": true,
+      "package": "com.serviom.exporeactchess"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {}
+      ],
       [
         "expo-splash-screen",
         {
