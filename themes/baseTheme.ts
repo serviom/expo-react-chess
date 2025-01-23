@@ -69,9 +69,9 @@ const themeOptions: CreateThemeOptions = {
     darkColors: {
         primary: '#439ce0', //#2089dc
         secondary: '#aa49eb',
-        background: '#57595a',
+        background: '#25292e',
         white: '#ffffff',
-        black: '#242424',
+        black: '#f2f2f2',
         grey0: '#e1e8ee',
         grey1: '#bdc6cf',
         grey2: '#86939e',

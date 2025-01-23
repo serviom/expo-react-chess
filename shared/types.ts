@@ -35,3 +35,4 @@ export enum Route {
     Home = '/home',
     Screen = '/screen',
 }
+

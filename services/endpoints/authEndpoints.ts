@@ -21,7 +21,7 @@ export const authEndpoints = api.injectEndpoints({
             },
         }),
         getUserProfile: builder.query({
-            query: ({}) => `/auth/user-profile`,
+            query: (params) => `/auth/user-profile`,
         }),
     }),
     overrideExisting: false,
