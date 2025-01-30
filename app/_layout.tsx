@@ -59,7 +59,6 @@ const RootLayout = () => {
                                         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                                         <Stack.Screen name="+not-found" />
                                     </Stack>
-
                                     {/*</ErrorBoundary>*/}
                             {/*    </Wrap>*/}
                             {/*</WebSocketProvider>*/}

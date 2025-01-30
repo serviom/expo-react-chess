@@ -8,6 +8,18 @@ export interface IAuthResponse {
     tokens: ITokens
 }
 
+export interface IForgotPasswordResponse extends IStatusResponse {
+    redirectUrl: string;
+}
+
+export interface IResetPasswordResponse extends IStatusResponse {
+    redirectUrl: string;
+}
+
+export interface IStatusResponse {
+    status: number;
+}
+
 export enum Role {
     Admin = 'admin',
     Moderator = 'moderator',
@@ -29,6 +41,8 @@ export enum Route {
     Logout = '/logout',
     SignUp = '/signUp',
     SignIn = '/signIn',
+    SignInByGoogle = '/signInByGoogle',
+    ForgotPassword = '/forgotPassword',
     ProfileSettings = '/profile/(tabs)/settings',
     ProfileInfo = '/profile/(tabs)/info',
     About = '/about',

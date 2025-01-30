@@ -8,7 +8,8 @@
     "scheme": "expo-react-chess",
     "userInterfaceStyle": "automatic",
     "platforms": [
-      "android"
+      "android",
+      "web"
     ],
     "newArchEnabled": true,
     "ios": {

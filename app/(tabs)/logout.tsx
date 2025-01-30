@@ -5,9 +5,9 @@ import {useSelector} from "react-redux";
 import {RootState} from "@/features/store";
 import {useRouter} from "expo-router";
 import {Route} from "@/shared/types";
+import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 
 const LoginScreen = () => {
-
     const authState = useSelector((state: RootState) => state.auth);
     const router = useRouter();
     const [logout, { isLoading, isError, isSuccess, error }] = useLogoutMutation();
@@ -22,12 +22,10 @@ const LoginScreen = () => {
     }
 
     return (
-        <View>
-
+        <ThemeChangeProvider>
             <Text>
                  {isLoading ? 'Loading...' : ''}
             </Text>
-
             {isError && error && (
                 <Text>
                     {
@@ -39,14 +37,13 @@ const LoginScreen = () => {
                     }
                 </Text>
             )}
-
             <Button
                 testID="btn-submit"
                 disabled={isLoading}
                 title="Logout"
                 onPress={handleLogout}
             />
-        </View>
+        </ThemeChangeProvider>
     );
 };
 

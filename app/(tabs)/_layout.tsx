@@ -92,6 +92,28 @@ export default function TabLayout() {
                 }}
             />
 
+            <Tabs.Screen
+                name="forgotPassword"
+                options={{
+                    title: 'Forgot password',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: null
+                }}
+            />
+
+            <Tabs.Screen
+                name="resetPassword"
+                options={{
+                    title: 'Reset password',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: null
+                }}
+            />
+
         </Tabs>
     );
 }

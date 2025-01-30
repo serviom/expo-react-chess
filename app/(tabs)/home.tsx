@@ -22,6 +22,12 @@ const HomeScreen = ()=> {
                     <Text>Go to Login screen</Text>
                 </Link>
                 {
+                    !authState.isAuth &&
+                    <Link href={Route.ForgotPassword} style={styles.button}>
+                        <Text>Forgot password</Text>
+                    </Link>
+                }
+                {
                     authState.isAuth &&
                     <Link href={Route.ProfileInfo} style={styles.button}>
                         <Text>User profile</Text>

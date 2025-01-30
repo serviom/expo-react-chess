@@ -6,7 +6,6 @@ import Toast from "react-native-toast-message";
 import {ThemedView} from "@/components/ThemedView";
 
 
-
 type styleProps = {
     mode: string;
 };
@@ -25,7 +24,7 @@ export const ThemeChangeProvider = ({ children }: { children?: React.ReactNode }
     }, []);
 
     return (
-        <>
+         <ThemedView style={[styles.wrapContainer, {margin: 'auto'}]}>
             <StatusBar style={mode} />
             <Toast />
             {/*,  { backgroundColor: mode === "dark" ? darkColors.background : lightColors.background}*/}
@@ -46,7 +45,7 @@ export const ThemeChangeProvider = ({ children }: { children?: React.ReactNode }
                     <Text>Bottom Block</Text>
                 </ThemedView>
             </ThemedView>
-        </>
+        </ThemedView>
     );
 };
 
@@ -91,5 +90,15 @@ const styles = StyleSheet.create({
     },
     topBlock: {
         justifyContent: 'flex-end',
+    },
+    wrapContainer: {
+        margin: 10,
+        textAlign: 'right',
+        alignItems: 'center',
+        height: 500,
+        borderStyle: 'solid',
+        borderColor: 'red',
+        borderWidth: 1,
+        width: '100%',
     }
 });

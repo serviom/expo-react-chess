@@ -16,7 +16,7 @@ export function KeyStoreProvider({ children }: { children: React.ReactNode }) {
       if (payload) {
         const { version, sessionId, ...user }: IUserPayloadOptions = payload;
         dispatch(login(user));
-        router.push(Route.ProfileInfo);
+        //router.push(Route.ProfileInfo);
       } else {
         dispatch(logout({}));
         router.push(Route.SignIn);

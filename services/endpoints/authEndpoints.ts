@@ -1,14 +1,81 @@
-import { api } from '../api';
-import { IAuthResponse } from '@/shared/types';
+import {api} from '../api';
+import {IAuthResponse, IForgotPasswordResponse, IResetPasswordResponse, IStatusResponse} from '@/shared/types';
+import {SignInFormValues} from "@/app/(tabs)/signIn";
+import {SignUpFormValues} from "@/app/(tabs)/signUp";
+import {ForgotPasswordValues} from "@/app/(tabs)/forgotPassword";
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export interface ResetPasswordValues {
+    password: string;
+    re_password: string;
+    changePasswordHash: string;
+    email: string;
+}
 
 export const authEndpoints = api.injectEndpoints({
     endpoints: (builder) => ({
-        signIn: builder.mutation<IAuthResponse, { email: string; password: string }>({
-            query: (credentials) => ({
-                url: '/auth/signIn',
-                method: 'POST',
-                body: credentials,
-            }),
+        signIn: builder.mutation<IAuthResponse, SignInFormValues>({
+
+            // queryFn: async (credentials, _queryApi, _extraOptions, fetchWithBQ) => {
+            //     // Додаємо затримку перед запитом
+            //     await delay(2000);
+            //
+            //     // Виконуємо запит через `fetchWithBQ`
+            //     const result = await fetchWithBQ({
+            //         url: '/auth/signIn',
+            //         method: 'POST',
+            //         body: credentials,
+            //     });
+            //
+            //     // Повертаємо результат запиту
+            //     return result.data
+            //         ? { data: result.data }
+            //         : { error: result.error };
+            // },
+
+            query: (credentials) => {
+                return {
+                    url: '/auth/signIn',
+                    method: 'POST',
+                    body: credentials,
+                }
+            },
+
+            // onQueryStarted: async (arg, { queryFulfilled }) => {
+            //     try {
+            //         await queryFulfilled;
+            //     } catch (err) {
+            //         console.error('Помилка у запиті signIn:', err);
+            //     }
+            // },
+        }),
+        signUp: builder.mutation<IAuthResponse, SignUpFormValues>({
+            query: (credentials) => {
+                return {
+                    url: '/auth/signUp',
+                    method: 'POST',
+                    body: credentials,
+                }
+            }
+        }),
+        forgotPassword: builder.mutation<IForgotPasswordResponse, ForgotPasswordValues>({
+            query: (credentials) => {
+                return {
+                    url: '/auth/forgotPassword',
+                    method: 'POST',
+                    body: credentials,
+                }
+            }
+        }),
+        resetPassword: builder.mutation<IResetPasswordResponse, ResetPasswordValues>({
+            query: (credentials) => {
+                return {
+                    url: '/auth/resetPassword',
+                    method: 'POST',
+                    body: credentials,
+                }
+            }
         }),
         logout: builder.mutation({
             query: (params) => {
@@ -21,10 +88,10 @@ export const authEndpoints = api.injectEndpoints({
             },
         }),
         getUserProfile: builder.query({
-            query: (params) => `/auth/user-profile`,
+            query: (id) => ({ url: `/auth/user-profile` }),
         }),
     }),
     overrideExisting: false,
 });
 
-export const { useSignInMutation, useLogoutMutation, useGetUserProfileQuery } = authEndpoints;
+export const { useSignInMutation, useForgotPasswordMutation, useResetPasswordMutation, useLogoutMutation, useGetUserProfileQuery } = authEndpoints;
