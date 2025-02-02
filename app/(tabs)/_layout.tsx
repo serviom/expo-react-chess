@@ -48,13 +48,24 @@ export default function TabLayout() {
 
 
             <Tabs.Screen
-                name="signIn"
+                name="sign_in"
                 options={{
                     title: 'Sign In',
                     tabBarIcon: ({color, focused}) => (
                         <Ionicons name={focused ? 'log-in' : 'log-in-outline'} color={color} size={24}/>
                     ),
                     href: !isAuth ? Route.SignIn : null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="sign_in_by_google"
+                options={{
+                    title: 'Sign In By Google',
+                    tabBarIcon: ({color, focused}) => (
+                        <Ionicons name={focused ? 'log-in' : 'log-in-outline'} color={color} size={24}/>
+                    ),
+                    href: null
                 }}
             />
 
@@ -70,7 +81,7 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="signUp"
+                name="sign_up"
                 options={{
                     title: 'Sign Up',
                     tabBarIcon: ({color, focused}) => (
@@ -78,6 +89,18 @@ export default function TabLayout() {
                                   size={24}/>
                     ),
                     href: !isAuth ? Route.SignUp : null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="activate"
+                options={{
+                    title: 'Activate',
+                    tabBarIcon: ({color, focused}) => (
+                        <Ionicons name={focused ? 'person-add' : 'person-add-outline'} color={color}
+                                  size={24}/>
+                    ),
+                    href: null,
                 }}
             />
 
@@ -93,7 +116,7 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="forgotPassword"
+                name="forgot_password"
                 options={{
                     title: 'Forgot password',
                     tabBarIcon: ({ color, focused }) => (
@@ -104,7 +127,7 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="resetPassword"
+                name="reset_password"
                 options={{
                     title: 'Reset password',
                     tabBarIcon: ({ color, focused }) => (

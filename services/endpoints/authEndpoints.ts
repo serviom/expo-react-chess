@@ -1,8 +1,16 @@
 import {api} from '../api';
-import {IAuthResponse, IForgotPasswordResponse, IResetPasswordResponse, IStatusResponse} from '@/shared/types';
-import {SignInFormValues} from "@/app/(tabs)/signIn";
-import {SignUpFormValues} from "@/app/(tabs)/signUp";
-import {ForgotPasswordValues} from "@/app/(tabs)/forgotPassword";
+import {
+    IActivateResponse,
+    IAuthResponse,
+    IForgotPasswordResponse,
+    IResetPasswordResponse,
+    ISignUpResponse
+} from '@/shared/types';
+import {SignInFormValues} from "@/app/(tabs)/sign_in";
+import {SignUpFormValues, SignUpValues} from "@/app/(tabs)/sign_up";
+import {ForgotPasswordValues} from "@/app/(tabs)/forgot_password";
+import {BaseNextRequest} from "next/dist/server/base-http";
+import {ActivateFormValues} from "@/app/(tabs)/activate";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -50,7 +58,16 @@ export const authEndpoints = api.injectEndpoints({
             //     }
             // },
         }),
-        signUp: builder.mutation<IAuthResponse, SignUpFormValues>({
+        signUp: builder.mutation<ISignUpResponse, SignUpValues>({
+            query: (credentials) => {
+                return {
+                    url: '/auth/signUp',
+                    method: 'POST',
+                    body: credentials,
+                }
+            }
+        }),
+        activate: builder.mutation<IActivateResponse, ActivateFormValues>({
             query: (credentials) => {
                 return {
                     url: '/auth/signUp',
@@ -90,8 +107,13 @@ export const authEndpoints = api.injectEndpoints({
         getUserProfile: builder.query({
             query: (id) => ({ url: `/auth/user-profile` }),
         }),
+        getUserRedirect: builder.query<IAuthResponse, string>({
+            query: (searchParams) => ({ url: `/auth/google/redirect${searchParams}`}),
+        }),
     }),
     overrideExisting: false,
 });
 
-export const { useSignInMutation, useForgotPasswordMutation, useResetPasswordMutation, useLogoutMutation, useGetUserProfileQuery } = authEndpoints;
+export const { useActivateMutation, useSignInMutation, useSignUpMutation,
+    useForgotPasswordMutation, useResetPasswordMutation, useLogoutMutation,
+    useGetUserProfileQuery, useGetUserRedirectQuery } = authEndpoints;

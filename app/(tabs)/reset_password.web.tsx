@@ -92,7 +92,7 @@ const ForgotScreen = () => {
         <ThemeChangeProvider>
             <Text>Reset Password</Text>
             {!authState.isAuth &&
-                <>
+                <div className="reset-password-container">
                     <PasswordInput control={control} errors={errors} />
                     <PasswordInput control={control} errors={errors} name="re_password" placeholder="Repeat password" />
 
@@ -102,8 +102,7 @@ const ForgotScreen = () => {
                         title="Reset Password"
                         loadingText="Loading..."
                     />
-
-                </>
+                </div>
             }
 
             {isError && <ErrorMessage error={error} />}

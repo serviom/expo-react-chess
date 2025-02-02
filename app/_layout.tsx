@@ -12,10 +12,23 @@ import { Button, createTheme, ThemeProvider } from '@rneui/themed';
 import { useThemeMode } from '@rneui/themed';
 import {ThemeModeProvider} from "@/providers/ThemeModeProvider";
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
+import LogRocket from 'logrocket';
 
 const RootLayout = () => {
     SplashScreen.preventAutoHideAsync();
     setTimeout(SplashScreen.hideAsync, 3000);
+
+    // useEffect(() => {
+    //     LogRocket.init('imlvi9/chess', {
+    //         shouldCaptureIP: false,
+    //         network: {
+    //             requestSanitizer: (request) => {
+    //                 delete request.headers['Authorization'];
+    //                 return request;
+    //             },
+    //         },
+    //     });
+    // }, []);
 
     const migrateDbIfNeeded = async (db: any) => {
         await db.execAsync(`

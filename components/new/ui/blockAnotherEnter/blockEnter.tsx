@@ -5,21 +5,23 @@ import {Href} from "expo-router/build/typed-routes/types";
 
 
 interface BlockProps {
-    children: React.ReactNode;
-    href: Href;
+    children?: React.ReactNode;
+    text: string;
+    url: Href;
 }
 
 const BlockEnter: React.FC<BlockProps> = ({
-        href,
-        children
+        url,
+        children,
+        text,
     }: BlockProps) => {
 
     return (
-        <Link href={href}>
-            {children}
+        <Link href={url}>
             <Text>
-                {children}
+                {text}
             </Text>
+            {children}
         </Link>
     );
 };

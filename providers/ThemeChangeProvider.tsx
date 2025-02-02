@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         margin: 10,
         textAlign: 'right',
         alignItems: 'center',
-        height: 500,
+        height: '100%',
         borderStyle: 'solid',
         borderColor: 'red',
         borderWidth: 1,

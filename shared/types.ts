@@ -8,8 +8,18 @@ export interface IAuthResponse {
     tokens: ITokens
 }
 
+export interface ISignUpResponse extends IStatusResponse {
+    redirectUrl: string;
+    user: IResponseUserAuth;
+}
+
+export interface IActivateResponse extends IStatusResponse {
+    redirectUrl: string;
+}
+
 export interface IForgotPasswordResponse extends IStatusResponse {
     redirectUrl: string;
+    email: string;
 }
 
 export interface IResetPasswordResponse extends IStatusResponse {
@@ -39,10 +49,13 @@ export interface IResponseUserAuth {
 
 export enum Route {
     Logout = '/logout',
-    SignUp = '/signUp',
-    SignIn = '/signIn',
-    SignInByGoogle = '/signInByGoogle',
-    ForgotPassword = '/forgotPassword',
+    SignUp = '/sign_up',
+    SignIn = '/sign_in',
+    Activate = '/activate',
+    SignInByGoogle = '/api/auth/google/login',
+    SignInByFacebook = '/sign_in_by_facebook',
+    ForgotPassword = '/forgot_password',
+    ResetPassword = '/reset_password',
     ProfileSettings = '/profile/(tabs)/settings',
     ProfileInfo = '/profile/(tabs)/info',
     About = '/about',

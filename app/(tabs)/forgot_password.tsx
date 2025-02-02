@@ -13,6 +13,7 @@ import ControlledInput from "@/components/new/forms/ControlledInput";
 import SubmitButton from "@/components/new/forms/SubmitButton";
 import {handleFormSubmission} from "@/common";
 import { Linking } from 'react-native';
+import ErrorMessage from "@/components/new/ui/ErrorMessage";
 
 const schema = yup.object({
     email: yup
@@ -85,18 +86,7 @@ const ForgotScreen = () => {
                     </Link>
                 </>
             }
-
-            {isError && error && (
-                <Text>
-                    {
-                        typeof error === 'string' ? (
-                            <Text> Error: {error}</Text>
-                        ) : (
-                            <Text> Error: {JSON.stringify(error)}</Text>
-                        )
-                    }
-                </Text>
-            )}
+            {isError && <ErrorMessage error={error} />}
         </ThemeChangeProvider>
     );
 };

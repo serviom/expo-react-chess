@@ -19,11 +19,11 @@ export function KeyStoreProvider({ children }: { children: React.ReactNode }) {
         //router.push(Route.ProfileInfo);
       } else {
         dispatch(logout({}));
-        router.push(Route.SignIn);
+        //router.push(Route.SignIn);
       }
     }).catch((error) => {
       dispatch(logout({}));
-      router.push(Route.SignIn);
+      //router.push(Route.SignIn);
     })
   }, [dispatch, router]);
 

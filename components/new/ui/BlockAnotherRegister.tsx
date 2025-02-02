@@ -1,7 +1,5 @@
 import React from 'react';
 import {StyleSheet} from "react-native";
-import {ThemedView} from "@/components/ThemedView";
-import {Text} from '@rneui/themed';
 import {Route} from "@/shared/types";
 import BlockEnter from "@/components/new/ui/blockAnotherEnter/blockEnter";
 
@@ -10,13 +8,10 @@ interface BlockAnotherEnterProps {
 
 const BlockAnotherEnter: React.FC<BlockAnotherEnterProps> = () => {
     return (
-        <ThemedView style={[styles.container]}>
-            <BlockEnter href={Route.SignInByGoogle}>
-                <Text>
-                    Увійти за допомогою Google
-                </Text>
-            </BlockEnter>
-        </ThemedView>
+        <>
+            <BlockEnter url={'http://localhost:3000/api/auth/google/login'} text={'Увійти за допомогою Google'} />
+            {/*<BlockEnter url={Route.SignInByFacebook} text={'Увійти за допомогою Facebook'} />*/}
+        </>
     );
 };
 

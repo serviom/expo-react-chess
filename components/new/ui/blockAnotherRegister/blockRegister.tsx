@@ -4,21 +4,25 @@ import {Text} from "@rneui/themed";
 import {Href} from "expo-router/build/typed-routes/types";
 
 
+
 interface RegisterProps {
-    children: React.ReactNode;
-    href: Href;
+    children?: React.ReactNode;
+    text: string;
+    url: Href;
 }
 
 const BlockRegister: React.FC<RegisterProps> = ({
-        href,
+        url,
+        text,
         children
     }: RegisterProps) => {
 
     return (
-        <Link href={href}>
+        <Link href={url}>
             <Text>
-                {children}
+                {text}
             </Text>
+            {children}
         </Link>
     );
 };

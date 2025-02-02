@@ -10,13 +10,9 @@ interface BlockAnotherEnterProps {
 
 const BlockAnotherEnter: React.FC<BlockAnotherEnterProps> = () => {
     return (
-        <ThemedView style={[styles.container]}>
-            <BlockEnter href={Route.SignInByGoogle}>
-                <Text>
-                    Увійти за допомогою Google
-                </Text>
-            </BlockEnter>
-        </ThemedView>
+        <>
+            <BlockEnter url={'http://localhost:3000/api/auth/google/login'} text={'Увійти за допомогою Google'} />
+        </>
     );
 };
 

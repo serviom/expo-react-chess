@@ -11,6 +11,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ControlledInput from "@/components/new/forms/ControlledInput";
 import SubmitButton from "@/components/new/forms/SubmitButton";
+import BlockAnotherEnter from "@/components/new/ui/BlockAnotherEnter";
+import {handleFormSubmission} from "@/common";
+import PasswordInput from "@/components/new/forms/PasswordInput";
+import {View} from "react-native";
+import ErrorMessage from "@/components/new/ui/ErrorMessage";
 
 
 const schema = yup.object({
@@ -24,7 +29,7 @@ const schema = yup.object({
         .min(6, "Password must be at least 6 characters")
 }).required();
 
-interface SignInFormValues {
+export interface SignInFormValues {
     email: string;
     password: string;
 }
@@ -51,21 +56,29 @@ const SignInScreen = () => {
         }
     );
 
+    // const onSubmit: SubmitHandler<SignInFormValues> = async (data: SignInFormValues) => {
+    //     try {
+    //         const response = await signIn(data).unwrap();
+    //     } catch (err: any) {
+    //         if (err.status === 400) {
+    //             err.data.errors.forEach((error: any) => {
+    //                 const fieldName = error.property as keyof SignInFormValues;
+    //                 const errorMessage = Object.values(error.constraints || {}).join(", ");
+    //                 setError(fieldName, {
+    //                     type: "server",
+    //                     message: errorMessage,
+    //                 });
+    //             });
+    //         }
+    //     }
+    // };
+
     const onSubmit: SubmitHandler<SignInFormValues> = async (data: SignInFormValues) => {
-        try {
-            const response = await signIn(data).unwrap();
-        } catch (err: any) {
-            if (err.status === 400) {
-                err.data.errors.forEach((error: any) => {
-                    const fieldName = error.property as keyof SignInFormValues;
-                    const errorMessage = Object.values(error.constraints || {}).join(", ");
-                    setError(fieldName, {
-                        type: "server",
-                        message: errorMessage,
-                    });
-                });
-            }
-        }
+        console.log(data);
+        await handleFormSubmission(
+            () => signIn(data).unwrap(),
+            setError
+        );
     };
 
 
@@ -84,22 +97,20 @@ const SignInScreen = () => {
 
             {!authState.isAuth &&
                 <>
+
+                    <View>
+                        <Text>Push notificator</Text>
+                    </View>
+
                     <ControlledInput
-                            control={control}
+                        control={control}
                         name="email"
                         placeholder="Email"
                         leftIcon={{type: 'material', name: 'email'}}
                         errors={errors}
                     />
 
-                    <ControlledInput
-                        control={control}
-                        name="password"
-                        placeholder="Password"
-                        secureTextEntry
-                        leftIcon={{type: 'material', name: 'lock'}}
-                        errors={errors}
-                    />
+                    <PasswordInput control={control} errors={errors} />
 
                     <Link href={Route.ForgotPassword}>
                         <Text>
@@ -114,6 +125,9 @@ const SignInScreen = () => {
                         loadingText="Loading..."
                     />
 
+                    <Text>Або</Text>
+                    <BlockAnotherEnter />
+
                     <Link href={Route.SignUp}>
                         <Text>
                             New? Sign up - and start playing chess!
@@ -123,19 +137,7 @@ const SignInScreen = () => {
             }
 
             {authState.isAuth && <Text>Login successful!</Text>}
-
-
-            {isError && error && (
-                <Text>
-                    {
-                        typeof error === 'string' ? (
-                            <Text> Error: {error}</Text>
-                        ) : (
-                            <Text> Error: {JSON.stringify(error)}</Text>
-                        )
-                    }
-                </Text>
-            )}
+            {isError && <ErrorMessage error={error} />}
         </ThemeChangeProvider>
     );
 };

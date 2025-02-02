@@ -1,10 +1,8 @@
-import React, {useState} from 'react';
-import {useSignInMutation} from '../../services/endpoints/authEndpoints';
-import {StyleSheet} from "react-native";
-import {usePathname, useRouter, Link} from "expo-router";
-import {Text, Icon } from '@rneui/themed';
+import React from 'react';
+import {useSignUpMutation} from '../../services/endpoints/authEndpoints';
+import {Link, useRouter} from "expo-router";
+import {Text} from '@rneui/themed';
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
-import {ThemedView} from "@/components/ThemedView";
 import {useSelector} from "react-redux";
 import {RootState} from "@/features/store";
 import {SubmitHandler, useForm} from "react-hook-form";
@@ -12,11 +10,12 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ControlledInput from "@/components/new/forms/ControlledInput";
 import SubmitButton from "@/components/new/forms/SubmitButton";
-import BlockAnotherEnter from "@/components/new/ui/BlockAnotherEnter";
 import {Route} from "@/shared/types";
 import BlockAnotherRegister from "@/components/new/ui/BlockAnotherRegister";
 import {handleFormSubmission} from "@/common";
 import PasswordInput from "@/components/new/forms/PasswordInput";
+import ErrorMessage from "@/components/new/ui/ErrorMessage";
+import {Linking, Platform} from "react-native";
 
 
 const schema = yup.object({
@@ -27,7 +26,7 @@ const schema = yup.object({
     username: yup
         .string()
         .required("Username is required")
-        .min(2, "Username must be at least 6 characters"),
+        .min(3, "Username must be at least 3 characters"),
     password: yup
         .string()
         .required("Password is required")
@@ -38,16 +37,20 @@ const schema = yup.object({
         .oneOf([yup.ref("password")], "Passwords must match"),
 }).required();
 
-export interface SignUpFormValues {
+export interface SignUpValues {
     email: string;
     password: string;
-    re_password: string;
     username: string;
 }
 
+export interface SignUpFormValues extends SignUpValues{
+    re_password: string;
+}
+
 const SignUpScreen = () => {
-    const [signUp, { isLoading, isError, isSuccess, error, reset }] = useSignInMutation();
+    const [signUp, { isLoading, isError, isSuccess, error, reset }] = useSignUpMutation();
     const authState = useSelector((state: RootState) => state.auth);
+    const router = useRouter();
 
     const {
         control,
@@ -61,15 +64,30 @@ const SignUpScreen = () => {
             defaultValues: {
                 email: process.env.EXPO_PUBLIC_DEFAULT_AUTH_EMAIL as string,
                 password: process.env.EXPO_PUBLIC_DEFAULT_AUTH_PASSWORD as string,
+                re_password: process.env.EXPO_PUBLIC_DEFAULT_AUTH_PASSWORD as string,
+                username: process.env.EXPO_PUBLIC_DEFAULT_AUTH_USERNAME as string,
             },
         }
     );
 
     const onSubmit: SubmitHandler<SignUpFormValues> = async (data: SignUpFormValues) => {
-        await handleFormSubmission(
-            () => signUp(data).unwrap(),
-            setError
-        );
+        try {
+            const { re_password, ...values} = data;
+            const result = await handleFormSubmission(
+                () => signUp(values).unwrap(),
+                setError
+            );
+
+            if (result.status === 1) {
+                if (Platform.OS === 'web') {
+                    await Linking.openURL(result.redirectUrl)
+                } else {
+                    router.push(Route.Activate);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
 
@@ -99,44 +117,11 @@ const SignUpScreen = () => {
                         control={control}
                         name="username"
                         placeholder="Username"
-                        leftIcon={{type: 'material', name: 'face'}}
-                        errors={errors}
-                    />
-
-                    <ControlledInput
-                        control={control}
-                        name="username1"
-                        placeholder="Username1"
-                        leftIcon={{type: 'material', name: 'badge'}}
-                        errors={errors}
-                    />
-
-                    <ControlledInput
-                        control={control}
-                        name="username2"
-                        placeholder="Username2"
-                        leftIcon={{type: 'material', name: 'person-outline'}}
-                        errors={errors}
-                    />
-
-                    <ControlledInput
-                        control={control}
-                        name="username3"
-                        placeholder="Username3"
-                        leftIcon={{type: 'material', name: 'person'}}
-                        errors={errors}
-                    />
-
-                    <ControlledInput
-                        control={control}
-                        name="username3"
-                        placeholder="Username3"
                         leftIcon={{type: 'material', name: 'account-circle'}}
                         errors={errors}
                     />
 
                     <PasswordInput control={control} errors={errors} />
-
                     <PasswordInput control={control} errors={errors} name="re_password" placeholder="Repeat password" />
 
                     <SubmitButton
@@ -158,19 +143,7 @@ const SignUpScreen = () => {
             }
 
             {authState.isAuth && <Text>Login successful!</Text>}
-
-            {isError && error && (
-                <Text>
-                    {
-                        typeof error === 'string' ? (
-                            <Text> Error: {error}</Text>
-                        ) : (
-                            <Text> Error: {JSON.stringify(error)}</Text>
-                        )
-                    }
-                </Text>
-            )}
-
+            {isError && <ErrorMessage error={error} />}
         </ThemeChangeProvider>
     );
 };

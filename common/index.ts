@@ -6,6 +6,7 @@ export const handleFormSubmission = async <T>(
         return await callback();
     } catch (err: any) {
         if (err.status === 400) {
+            console.error('handleFormSubmission err.message');
             err.data.errors.forEach((error: any) => {
                 const fieldName = error.property as keyof T;
                 const errorMessage = Object.values(error.constraints || {}).join(", ");
