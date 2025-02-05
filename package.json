@@ -20,6 +20,7 @@
     "@hookform/resolvers": "^3.10.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@reduxjs/toolkit": "^2.5.0",
@@ -29,6 +30,7 @@
     "axios": "^1.7.9",
     "dom-to-image": "^2.6.0",
     "expo": "~52.0.25",
+    "expo-auth-session": "~6.0.3",
     "expo-blur": "~14.0.2",
     "expo-constants": "17.0.4",
     "expo-env": "^1.1.1",
@@ -65,9 +67,8 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "react-redux": "^9.2.0",
-    "yup": "^1.6.1",
-    "expo-auth-session": "~6.0.3",
-    "undefined": "expo-auth-session/providers/google"
+    "undefined": "expo-auth-session/providers/google",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

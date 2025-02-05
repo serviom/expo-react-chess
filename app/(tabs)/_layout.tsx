@@ -70,6 +70,17 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
+                name="play"
+                options={{
+                    title: 'Play Chess',
+                    tabBarIcon: ({color, focused}) => (
+                        <Ionicons name={focused ? 'log-out' : 'log-out-outline'} color={color} size={24}/>
+                    ),
+                    href: Route.Play
+                }}
+            />
+
+            <Tabs.Screen
                 name="logout"
                 options={{
                     title: 'Logout',

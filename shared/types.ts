@@ -48,6 +48,7 @@ export interface IResponseUserAuth {
 }
 
 export enum Route {
+    Play = '/play',
     Logout = '/logout',
     SignUp = '/sign_up',
     SignIn = '/sign_in',
