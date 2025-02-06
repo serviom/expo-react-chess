@@ -1,14 +1,10 @@
-import { ActivityIndicator, StatusBar, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
-// import { StateType, useAppDispatch } from '@/features/store'; need
-// import { profileAction } from '@/features/auth/authActions'; nedd
-import { useSelector } from 'react-redux';
-import { Background } from '@/components/Background';
-import { Synchronization } from '@/components/Synchronization';
+import React from 'react';
+import {ScrollView} from "react-native";
+
 
 export const Wrap = ({ children }: { children: React.ReactNode }) => {
   // const dispatch = useAppDispatch(); // need
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   // const { tokens } = useSelector((state: StateType) => state.auth); // need
 
   // need
@@ -22,9 +18,11 @@ export const Wrap = ({ children }: { children: React.ReactNode }) => {
   // }, [tokens]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Background />
-      <Synchronization>{loading ? <ActivityIndicator size="large" /> : children}</Synchronization>
-    </View>
+    <ScrollView horizontal={false} style={{ flex: 1 }}>
+        <ScrollView horizontal={false} style={{ flex: 1 }}>
+            {children}
+            {/*<Background />*/}
+        </ScrollView>
+    </ScrollView>
   );
 };

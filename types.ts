@@ -1,3 +1,5 @@
+import {Player} from "@/models/Player";
+
 export type NavigationType = {
     push: (tab: string, params?: any) => void;
     goBack: () => void;
@@ -31,3 +33,9 @@ export const modePlayerOptions: ISelectOption[] = [
     initialStateModePlayerOptions,
     {value: modePlayer.AUTO, label: LABEL_AUTO},
 ];
+
+export interface chessContextType {
+    mode: number;
+    currentPlayer: Player | null;
+    rotate: boolean;
+}

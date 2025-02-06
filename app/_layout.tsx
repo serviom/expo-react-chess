@@ -13,6 +13,7 @@ import { useThemeMode } from '@rneui/themed';
 import {ThemeModeProvider} from "@/providers/ThemeModeProvider";
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 import LogRocket from 'logrocket';
+import {Wrap} from "@/components/Wrap";
 
 const RootLayout = () => {
     SplashScreen.preventAutoHideAsync();
@@ -64,16 +65,18 @@ const RootLayout = () => {
                     {/*<PushNotificationProvider>*/}
                         {/*<SQLiteProvider databaseName="test.db" onInit={migrateDbIfNeeded} useSuspense>*/}
                             {/*<WebSocketProvider>*/}
-                            {/*    <Wrap>*/}
+
                                     {/*<ErrorBoundary FallbackComponent={CustomErrorFallback}>*/}
 
                                     {/*<ConnectionChecker />*/}
-                                    <Stack>
-                                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                                        <Stack.Screen name="+not-found" />
-                                    </Stack>
                                     {/*</ErrorBoundary>*/}
-                            {/*    </Wrap>*/}
+
+                                    {/*<Wrap>*/}
+                                        <Stack>
+                                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                            <Stack.Screen name="+not-found" />
+                                        </Stack>
+                                    {/*</Wrap>*/}
                             {/*</WebSocketProvider>*/}
                         {/*</SQLiteProvider>*/}
                     {/*</PushNotificationProvider>*/}

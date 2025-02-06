@@ -44,6 +44,14 @@
           "project": "sentry project name, or use the `SENTRY_PROJECT` environment variable",
           "url": "https://sentry.io/"
         }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
       ]
     ],
     "experiments": {
