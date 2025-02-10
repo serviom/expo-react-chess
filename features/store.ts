@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import boardReducer from './board/boardSlice';
+import controlReducer from './control/controlSlice';
 import { api } from '../services/api';
 import {useDispatch} from "react-redux";
 
@@ -8,6 +9,7 @@ const storeToolkit = configureStore({
     reducer: {
         auth: authReducer,
         board: boardReducer,
+        control: controlReducer,
         [api.reducerPath]: api.reducer
     },
     middleware: (getDefaultMiddleware) =>

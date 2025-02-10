@@ -5,8 +5,6 @@ import {Alert, Modal, Pressable, StyleSheet, Text, View} from "react-native";
 const ModalComponent = () => {
     const { isOpen, message, closeModal } = useModal();
 
-    console.log('isOpen', isOpen);
-
      if (!isOpen) return null;
 
     return (

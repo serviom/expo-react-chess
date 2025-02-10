@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet} from "react-native";
 import {Route} from "@/shared/types";
-import BlockEnter from "@/components/new/ui/blockAnotherEnter/blockEnter";
+import BlockEnter from "@/components/ui/blockAnotherEnter/blockEnter";
 
 interface BlockAnotherEnterProps {
 }

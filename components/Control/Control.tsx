@@ -1,51 +1,59 @@
 import React, {FC, useEffect, useRef, useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
-import {SingleValue, ISelectOption, modePlayerOptions, Player} from "../types";
-import {BestMove} from "../utils/singletons/stockfish";
-import {roundTime} from "../utils/date";
+import {SingleValue, ISelectOption, modePlayerOptions, Player} from "../../types";
+import {BestMove} from "../../utils/singletons/stockfish";
+import {roundTime} from "../../utils/date";
 import {View, Text, StyleSheet  } from "react-native";
 import {CheckBox, Button} from '@rneui/themed';
 import {PlayerTypes} from "@/constants";
+import {useControl} from "@/providers/ControlProvider";
+import Timer from "@/components/Control/includes/Timer";
 
-interface TimerProps {
-    currentPlayer: Player | null;
+import {
+    endGame as endGameControl,
+    restartGame as restartGameControl,
+    setFinish,
+    setPause
+} from "@/features/control/controlSlice";
+
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, useAppDispatch} from "@/features/store";
+
+interface ControlProps {
     restart: () => void;
-    start: boolean;
-    changeMode: (selectedMode: number) => void;
-    mode: number;
-    rotate: boolean;
-    switchRotate: () => void;
     endGame: () => void;
-    modeWhitePlayer: SingleValue<ISelectOption>;
-    modeBlackPlayer: SingleValue<ISelectOption>;
-    setModeWhitePlayer: (newValue: SingleValue<ISelectOption>) => void;
-    setModeBlackPlayer: (newValue: SingleValue<ISelectOption>) => void;
     showBestMove: () => void;
-    pause: boolean;
-    setPause: (mode: boolean) => void;
     moveBestMove: () => void;
     bestMove: BestMove | undefined;
     spentTimeForMove: number | undefined;
-    timeOver: () => void;
-    finish: boolean;
-    analyze: boolean;
+    modeWhitePlayer: SingleValue<ISelectOption>;
+    setModeWhitePlayer: (val: SingleValue<ISelectOption>) => void;
+    modeBlackPlayer: SingleValue<ISelectOption>;
+    setModeBlackPlayer: (val: SingleValue<ISelectOption>) => void;
 }
 
-const matchTime = 5 * 1000; // seconds * 1000
-const stepTime = 100; // ms
+const matchTime = 300 * 1000; // seconds * 1000
+const stepTime = 50; // ms
 
-const Control: FC<TimerProps> = ({
-         modeWhitePlayer, setModeWhitePlayer, modeBlackPlayer,
-         setModeBlackPlayer, currentPlayer, restart, start, changeMode,
-         mode, rotate, switchRotate, endGame, showBestMove, pause,
-         setPause, bestMove, moveBestMove, spentTimeForMove, timeOver, finish, analyze
+const Control: FC<ControlProps> = ({
+         restart, endGame, showBestMove,
+         bestMove, moveBestMove, setModeWhitePlayer, setModeBlackPlayer,
+         spentTimeForMove, modeWhitePlayer, modeBlackPlayer
+     }: ControlProps) => {
 
-     }) => {
+    const {start, analyze, finish, pause} = useSelector((state: RootState) => state.control)
+    const { mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer,  } = useControl();
+
+    const [blackTime, setBlackTime] = useState<number>(matchTime);
+    const [whiteTime, setWhiteTime] = useState<number>(matchTime);
 
     const fullMatchTimeBlack = useRef<number>(matchTime);
     const fullMatchTimeWhite = useRef<number>(matchTime);
     const timer = useRef<null | ReturnType<typeof setInterval>>(null)
 
+    const dispatch = useAppDispatch();
+
+    // TODO перенести час в окремий компонент
     useEffect(() => {
         if (!finish && !analyze) {
             if (spentTimeForMove) {
@@ -81,10 +89,6 @@ const Control: FC<TimerProps> = ({
         restart()
     }
 
-
-    const [blackTime, setBlackTime] = useState<number>(matchTime);
-    const [whiteTime, setWhiteTime] = useState<number>(matchTime);
-
     function startTimer() {
         if (timer.current) {
             clearInterval(timer.current)
@@ -99,6 +103,14 @@ const Control: FC<TimerProps> = ({
 
     function decrementWhiteTimer() {
         setWhiteTime(prev => prev - stepTime);
+    }
+
+    function changeMode(selectedMode: number) {
+        setMode(selectedMode);
+    }
+
+    function switchRotate() {
+        setRotate(!rotate);
     }
 
     function getSeconds() {
@@ -149,14 +161,7 @@ const Control: FC<TimerProps> = ({
                 />
             </View>
 
-            {
-                start && (
-                    <View>
-                        <Text>Чорні - {blackTime / 1000} сек.</Text>
-                        <Text>Білі - {whiteTime / 1000} сек. </Text>
-                    </View>
-                )
-            }
+            <Timer blackTime={blackTime} whiteTime={whiteTime} start={start} />
 
             <View style={styles.container}>
                 <View style={styles.wrapType}>
@@ -244,7 +249,7 @@ const Control: FC<TimerProps> = ({
             <View>
                 <Button
                     title={pause ? 'Pause on' : 'Pause off'}
-                    onPress={() => setPause(!pause)}
+                    onPress={() => dispatch(setPause(!pause))}
                 />
             </View>
         </View>

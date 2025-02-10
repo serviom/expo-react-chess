@@ -1,8 +1,8 @@
-import React, {createContext, FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import BoardComponent, {BoardProps} from "./BoardComponent";
 import {BLACK_WON, Board, WHITE_WON} from "../models/Board";
-import Notice, {moveTree, NoticeProps} from "./Notice";
-import {Text, useWindowDimensions} from "react-native";
+import {moveTree} from "./Notice";
+import {Text, View} from "react-native";
 
 import {
     setAnalysisNotice,
@@ -12,6 +12,8 @@ import {
     setNotice,
     setPrevCell
 } from "@/features/board/boardSlice";
+
+import {endGame as endGameControl, restartGame as restartGameControl, setFinish} from "@/features/control/controlSlice";
 
 import {
     CastleTypes,
@@ -35,24 +37,16 @@ import {Queen} from "../models/figures/Queen";
 import {Knight} from "../models/figures/Knight";
 import {Cell} from "../models/Cell";
 import {BestMove, getBestmoveByStockfish} from "../utils/singletons/stockfish";
-import {
-    initialStateModePlayerOptions,
-    ISelectOption,
-    modePlayer, Player, SingleValue,
-    ValueOf
-} from "../types";
+import {initialStateModePlayerOptions, ISelectOption, modePlayer, SingleValue} from "../types";
 // import {ISelectOption} from "../ui-kit/Select";
 import {getTimeInNumber} from "../utils/date";
-import {Dimensions, StyleSheet, View} from "react-native";
 import {RootState, useAppDispatch} from "@/features/store";
 import {useSelector} from "react-redux";
-import {removeDataInStorage, saveLastCodeMoveToStorage, storeDataInStorage} from "@/utils/storage";
-import {CELL_SIZE, MODE, NOTES_LOCAL_STORAGE, PlayerTypes, ROTATE} from "@/constants";
-import {ChessContext} from "@/initChessContext";
-import Control from "@/components/Control";
+import {removeDataInStorage, saveLastCodeMoveToStorage} from "@/utils/storage";
+import {NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
+import Control from "@/components/Control/Control";
+import {useControl} from "@/providers/ControlProvider";
 import {useModal} from "@/providers/ModalProvider";
-import ModalComponent from "@/components/ModalComponent";
-
 
 const START_COUNTER = 0;
 const START_FEN_STRING_CASTLE = 'KQkq';
@@ -80,27 +74,22 @@ export const initialStaticRefObject = {
 const Chess: FC = () => {
     const [pgn, setPgn] = useState(''); // Declare a state variable...
     const [board, setBoard] = useState(new Board());
-    const [start, setStart] = useState<boolean>(false);
-    const [finish, setFinish] = useState<boolean>(false);
-    const [pause, setPause] = useState<boolean>(false);
-    const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
-    const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
+    const {start, analyze, finish, pause} = useSelector((state: RootState) => state.control)
+    const dispatch = useAppDispatch();
 
     const [isOpenedSelectFigure, setIsOpenedSelectFigure] = useState(false);
-    const [analyze, setAnalyze] = useState<boolean>(false);
-    const [mode, setMode] = useState(MODE);
-    const [rotate, setRotate] = useState(ROTATE);
+
     const whitePlayer = PlayerTypes.WHITE;
     const blackPlayer = PlayerTypes.BLACK;
-    const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
 
-    const dispatch = useAppDispatch();
+    const {currentPlayer, setCurrentPlayer} = useControl();
+
+    const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
+    const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
 
 
     // показує поточну позицію в дереві ходів для гри
     const counterMove = useRef<number>(START_COUNTER);
-    const startMoveTime = useRef<number | undefined>(undefined);
-    const spentTimeForMove = useRef<number | undefined>(undefined);
 
     // показує поточну позицію в дереві ходів для аналізатора
     const counterAnalysisMove = useRef<number>(START_COUNTER);
@@ -123,13 +112,9 @@ const Chess: FC = () => {
     const [isFirst, setIsFirst] = useState<boolean>(false);
 
     const [bestMove, setBestMove] = useState<BestMove | undefined>(undefined);
-    const [cellSize, setCellSize] = useState<number>(CELL_SIZE);
 
-    const { width, height } = useWindowDimensions();
+    const {openModal} = useModal();
 
-    useEffect(() => {
-        setCellSize(Math.floor(width/8));
-    }, [width]);
 
     useEffect(() => {
         init();
@@ -148,11 +133,7 @@ const Chess: FC = () => {
             return;
         }
 
-        if (startMoveTime.current !== undefined) {
-            spentTimeForMove.current = getTimeInNumber() - startMoveTime.current;
-        }
 
-        startMoveTime.current = getTimeInNumber();
 
         setIsNext(checkIsNext());
         setIsLast(checkIsLast());
@@ -166,8 +147,8 @@ const Chess: FC = () => {
             const {status, msg} = board.theEnd(currentPlayer);
 
             if (status) {
-                // openModal(msg);
-                setFinish(true);
+                openModal(msg);
+                dispatch(setFinish(true));
                 return;
             }
 
@@ -196,23 +177,6 @@ const Chess: FC = () => {
         }
 
     }, [start]);
-
-
-    const timeOver = () => {
-        const msg = currentPlayer === PlayerTypes.WHITE ? BLACK_WON : WHITE_WON;
-        if (!finish) {
-          //  openModal(msg);
-        }
-        setFinish(true);
-        return;
-    }
-
-    const chessContext = {
-        mode,
-        currentPlayer,
-        rotate,
-        cellSize
-    }
 
     function getAnalysisDeep() {
         const currentMoveTree = searchItemForAnalysisById(boardState.analysis_notes, counterAnalysisMove.current);
@@ -451,18 +415,15 @@ const Chess: FC = () => {
     }
 
     async function endGame() {
-        setStart(false);
-        setAnalyze(false);
+        dispatch(endGameControl());
         setCurrentPlayer(null);
         await init();
     }
 
-    async function restart() {
+    async function restartGame() {
         startMoveTime.current = undefined;
         spentTimeForMove.current = undefined;
-        setStart(true);
-        setFinish(false);
-        setAnalyze(false);
+        dispatch(restartGameControl());
         await init();
         setCurrentPlayer(whitePlayer);
     }
@@ -575,16 +536,8 @@ const Chess: FC = () => {
         counterAnalysisMove.current = counterAnalysisMoveIncrease.current;
     }
 
-    function changeMode(selectedMode: number) {
-        setMode(selectedMode);
-    }
-
-    function switchRotate() {
-        setRotate(!rotate);
-    }
-
     function swapPlayer() {
-        setCurrentPlayer(prev => (prev === PlayerTypes.WHITE ? blackPlayer : whitePlayer));
+        setCurrentPlayer(currentPlayer === PlayerTypes.WHITE ? PlayerTypes.BLACK : PlayerTypes.WHITE);
     }
 
     async function clearNotice(): Promise<void> {
@@ -811,27 +764,25 @@ const Chess: FC = () => {
         goToAnalysisEnd();
     }
 
-    const propsForNotice : NoticeProps = {
-        nextMove,
-        prevMove,
-        firstMove,
-        lastMove,
-        goToStep,
-        setAnalyze,
-        setStart,
-        pgn,
-        setPgn,
-        analyze,
-        start,
-        counter: counterMove.current,
-        counterAnalysisMove,
-        goToAnalysisStep,
-        isNext,
-        isLast,
-        isPrev,
-        loadAnalyze,
-        isFirst,
-    }
+    // const propsForNotice : NoticeProps = {
+    //     nextMove,
+    //     prevMove,
+    //     firstMove,
+    //     lastMove,
+    //     goToStep,
+    //     pgn,
+    //     setPgn,
+    //     analyze,
+    //     start,
+    //     counter: counterMove.current,
+    //     counterAnalysisMove,
+    //     goToAnalysisStep,
+    //     isNext,
+    //     isLast,
+    //     isPrev,
+    //     loadAnalyze,
+    //     isFirst,
+    // }
 
     const props: BoardProps = {
         board,
@@ -859,50 +810,36 @@ const Chess: FC = () => {
         <View>
             <View>
                 <Text>{getSeconds()}</Text>
-
                 <Control
-                    restart={restart}
-                    changeMode={changeMode}
-                    currentPlayer={currentPlayer}
-                    mode={mode}
-                    rotate={rotate}
-                    start={start}
-                    switchRotate={switchRotate}
+                    restart={restartGame}
                     endGame={endGame}
-                    modeWhitePlayer={modeWhitePlayer}
-                    setModeWhitePlayer={setModeWhitePlayer}
-                    modeBlackPlayer={modeBlackPlayer}
-                    setModeBlackPlayer={setModeBlackPlayer}
                     showBestMove={showBestMove}
                     moveBestMove={moveBestMove}
                     bestMove={bestMove}
-                    pause={pause}
-                    setPause={setPause}
                     spentTimeForMove={spentTimeForMove.current}
-                    timeOver={timeOver}
-                    finish={finish}
-                    analyze={analyze}
+                    setModeBlackPlayer={setModeBlackPlayer}
+                    modeBlackPlayer={modeBlackPlayer}
+                    setModeWhitePlayer={setModeWhitePlayer}
+                    modeWhitePlayer={modeWhitePlayer}
                 />
             </View>
             <View>
-                <Notice
-                    {...propsForNotice}
-                />
+                {/*<Notice*/}
+                {/*    {...propsForNotice}*/}
+                {/*/>*/}
             </View>
             <View>
-                <ChessContext.Provider value={chessContext}>
-                    <BoardComponent  {...props} />
-                    <View>
-                        {/*<LostFigures*/}
-                        {/*    title="Чорні фігури"*/}
-                        {/*    figures={board.lostBlackFigures}*/}
-                        {/*/>*/}
-                        {/*<LostFigures*/}
-                        {/*    title="Білі фігури"*/}
-                        {/*    figures={board.lostWhiteFigures}*/}
-                        {/*/>*/}
-                    </View>
-                </ChessContext.Provider>
+                <BoardComponent  {...props} />
+                <View>
+                    {/*<LostFigures*/}
+                    {/*    title="Чорні фігури"*/}
+                    {/*    figures={board.lostBlackFigures}*/}
+                    {/*/>*/}
+                    {/*<LostFigures*/}
+                    {/*    title="Білі фігури"*/}
+                    {/*    figures={board.lostWhiteFigures}*/}
+                    {/*/>*/}
+                </View>
             </View>
         </View>
     );

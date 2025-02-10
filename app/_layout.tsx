@@ -1,7 +1,7 @@
 import {Slot, SplashScreen, Stack} from "expo-router";
 import React, {useEffect} from "react";
 import {StatusBar} from "expo-status-bar";
-import {ConnectionChecker} from "@/components/ConnectionChecker";
+import {ConnectionChecker} from "@/components_old/ConnectionChecker";
 import Toast from 'react-native-toast-message';
 import StoreProvider from "@/providers/StoreProvider";
 import {Text, View} from "react-native";

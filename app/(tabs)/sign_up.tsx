@@ -8,13 +8,13 @@ import {RootState} from "@/features/store";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import ControlledInput from "@/components/new/forms/ControlledInput";
-import SubmitButton from "@/components/new/forms/SubmitButton";
+import ControlledInput from "@/components/forms/ControlledInput";
+import SubmitButton from "@/components/forms/SubmitButton";
 import {Route} from "@/shared/types";
-import BlockAnotherRegister from "@/components/new/ui/BlockAnotherRegister";
+import BlockAnotherRegister from "@/components/ui/BlockAnotherRegister";
 import {handleFormSubmission} from "@/common";
-import PasswordInput from "@/components/new/forms/PasswordInput";
-import ErrorMessage from "@/components/new/ui/ErrorMessage";
+import PasswordInput from "@/components/forms/PasswordInput";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 import {Linking, Platform} from "react-native";
 
 

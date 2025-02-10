@@ -10,16 +10,14 @@ import {staticRefObject} from "./Chess";
 import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
 import {BoardState} from "@/features/board/boardSlice";
-import {ChessContext} from "@/initChessContext";
-
 
 import {PlayerTypes} from "@/constants";
 import {Player} from "@/types";
 import {PopupBoxSelectFigureComponent} from "@/components/PopupBoxSelectFigureComponent";
 import {makeCoordinateByLine} from "@/utils/board";
 import ModalComponent from "@/components/ModalComponent";
-import {ModalContext} from "native-base/lib/typescript/components/composites/Modal/Context";
 import {useModal} from "@/providers/ModalProvider";
+import {useControl} from "@/providers/ControlProvider";
 
 export interface BoardProps {
     board: Board;
@@ -40,12 +38,13 @@ export interface BoardProps {
 
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
-    const {board, currentPlayer, counter, analyze, currentMoveIsLast, isOpenedSelectFigure, setIsOpenedSelectFigure,
-        start, moveOnClick, setFigure, myState, updateBoard, selectedCell, setSelectedCell} = props;
+    const {board, currentPlayer, counter, analyze, currentMoveIsLast, isOpenedSelectFigure,
+        setIsOpenedSelectFigure, start, moveOnClick, setFigure, myState, updateBoard,
+        selectedCell, setSelectedCell} = props;
 
     const dispatch = useAppDispatch();
     const boardState = useSelector((state: RootState) => state.board);
-    const {rotate, cellSize} = useContext(ChessContext);
+    const {rotate, cellSize} = useControl();
     const {openModal} = useModal();
 
     // useImperativeHandle(ref, () => ({
@@ -56,14 +55,6 @@ const BoardComponent = (props: BoardProps) => {
 
 
     useEffect(() => {
-
-        setTimeout( () => {
-            openModal('sadfasdf');
-        }, 2000)
-    }, []);
-
-    useEffect(() => {
-        console.log('selectedCell', selectedCell);
         if (currentPlayer) {
             board.highlightCells(selectedCell, currentPlayer, boardState as BoardState);
             updateBoard()
@@ -73,7 +64,6 @@ const BoardComponent = (props: BoardProps) => {
     const clickHandler = useCallback((colIndex: number, rowIndex: number): void => {
 
         const targetCell = board.getCell(rowIndex, colIndex);
-        console.log('targetCell', targetCell);
 
         if (!currentPlayer) {
             return;

@@ -1,6 +1,5 @@
 import React, {FC, memo, useContext, useEffect, useMemo} from 'react';
 import {View, TouchableOpacity, StyleSheet, Text, GestureResponderEvent} from 'react-native';
-import {ChessContext} from "@/initChessContext";
 import {ImageBackground} from "expo-image";
 import {interCoordinateHorValue, interCoordinateVertValue, makeCoordinateByLine} from "@/utils/board";
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/constants";
 import {FigureNameEn} from "@/models/figures/Figure";
 import {Player} from "@/types";
+import {useControl} from "@/providers/ControlProvider";
 
 interface CellProps {
   selected: boolean;
@@ -28,7 +28,7 @@ interface CellProps {
 }
 
 const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellColor, figureNameEn, figureColor, selected, click, rowIndex, colIndex, isEnPassantFigure, available, isFigure } : CellProps) => {
-  const { mode, rotate, cellSize } = useContext(ChessContext);
+  const { mode, rotate, cellSize } = useControl();
 
   const styles = useMemo(() => StyleSheet.create({
     white_mode3: {

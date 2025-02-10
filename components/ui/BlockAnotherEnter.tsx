@@ -3,7 +3,7 @@ import {StyleSheet} from "react-native";
 import {ThemedView} from "@/components/ThemedView";
 import {Text} from '@rneui/themed';
 import {Route} from "@/shared/types";
-import BlockEnter from "@/components/new/ui/blockAnotherEnter/blockEnter";
+import BlockEnter from "@/components/ui/blockAnotherEnter/blockEnter";
 
 interface BlockAnotherEnterProps {
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Icon } from "@rneui/themed";
-import ControlledInput from "@/components/new/forms/ControlledInput";
+import ControlledInput from "@/components/forms/ControlledInput";
 
 interface PasswordInputProps {
     control: any;

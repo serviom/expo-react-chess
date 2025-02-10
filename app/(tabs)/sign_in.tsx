@@ -9,13 +9,13 @@ import {RootState} from "@/features/store";
 import { useForm, SubmitHandler, Controller  } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import ControlledInput from "@/components/new/forms/ControlledInput";
-import SubmitButton from "@/components/new/forms/SubmitButton";
-import BlockAnotherEnter from "@/components/new/ui/BlockAnotherEnter";
+import ControlledInput from "@/components/forms/ControlledInput";
+import SubmitButton from "@/components/forms/SubmitButton";
+import BlockAnotherEnter from "@/components/ui/BlockAnotherEnter";
 import {handleFormSubmission} from "@/common";
-import PasswordInput from "@/components/new/forms/PasswordInput";
+import PasswordInput from "@/components/forms/PasswordInput";
 import {View} from "react-native";
-import ErrorMessage from "@/components/new/ui/ErrorMessage";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 
 const schema = yup.object({

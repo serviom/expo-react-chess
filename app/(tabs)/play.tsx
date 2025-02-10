@@ -2,12 +2,15 @@ import {ScrollView, StyleSheet, SafeAreaView} from 'react-native';
 import React from 'react';
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 import Chess from "../../components/Chess";
+import {ControlProvider} from "@/providers/ControlProvider";
 
 const PlayScreen = ()=> {
 
     return (
         <ThemeChangeProvider>
-            <Chess />
+            <ControlProvider>
+                <Chess />
+            </ControlProvider>
         </ThemeChangeProvider>
     );
 }
