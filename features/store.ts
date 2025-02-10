@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
-import boardReducer from './auth/boardSlice';
+import boardReducer from './board/boardSlice';
 import { api } from '../services/api';
 import {useDispatch} from "react-redux";
 

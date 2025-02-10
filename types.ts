@@ -1,4 +1,5 @@
-import {Player} from "@/models/Player";
+import {PlayerTypes} from "@/constants";
+import {FigureNameEn} from "@/models/figures/Figure";
 
 export type NavigationType = {
     push: (tab: string, params?: any) => void;
@@ -34,8 +35,19 @@ export const modePlayerOptions: ISelectOption[] = [
     {value: modePlayer.AUTO, label: LABEL_AUTO},
 ];
 
+//export type Player = ValueOf<typeof Players>;
+export type Player = (typeof PlayerTypes)[keyof typeof PlayerTypes];
+
 export interface chessContextType {
     mode: number;
     currentPlayer: Player | null;
     rotate: boolean;
+    cellSize: number;
+}
+
+export interface CellInfo {
+    readonly x: number;
+    readonly y: number;
+    figure: FigureNameEn | null;
+    color: Player | null;
 }

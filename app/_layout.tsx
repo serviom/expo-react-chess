@@ -14,6 +14,7 @@ import {ThemeModeProvider} from "@/providers/ThemeModeProvider";
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 import LogRocket from 'logrocket';
 import {Wrap} from "@/components/Wrap";
+import {ModalProvider} from "@/providers/ModalProvider";
 
 const RootLayout = () => {
     SplashScreen.preventAutoHideAsync();
@@ -62,20 +63,20 @@ const RootLayout = () => {
         <ThemeModeProvider>
             <StoreProvider>
                 <KeyStoreProvider>
+
                     {/*<PushNotificationProvider>*/}
                         {/*<SQLiteProvider databaseName="test.db" onInit={migrateDbIfNeeded} useSuspense>*/}
                             {/*<WebSocketProvider>*/}
-
                                     {/*<ErrorBoundary FallbackComponent={CustomErrorFallback}>*/}
-
                                     {/*<ConnectionChecker />*/}
                                     {/*</ErrorBoundary>*/}
-
                                     {/*<Wrap>*/}
+
                                         <Stack>
                                             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                                             <Stack.Screen name="+not-found" />
                                         </Stack>
+
                                     {/*</Wrap>*/}
                             {/*</WebSocketProvider>*/}
                         {/*</SQLiteProvider>*/}

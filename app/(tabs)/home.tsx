@@ -21,6 +21,18 @@ const HomeScreen = ()=> {
                 <Link href={Route.SignIn} style={styles.button}>
                     <Text>Go to Login screen</Text>
                 </Link>
+                <Link href={'/animate'} style={styles.button}>
+                    <Text>Animate</Text>
+                </Link>
+                <Link href={'/modal'} style={styles.button}>
+                    <Text>Modal</Text>
+                </Link>
+                <Link href={'/canvas'} style={styles.button}>
+                    <Text>Canvas page</Text>
+                </Link>
+                <Link href={'/board_screen'} style={styles.button}>
+                    <Text>Board screen</Text>
+                </Link>
                 {
                     !authState.isAuth &&
                     <Link href={Route.ForgotPassword} style={styles.button}>

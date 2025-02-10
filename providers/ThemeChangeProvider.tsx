@@ -4,6 +4,8 @@ import {darkColors, lightColors, Switch, useThemeMode, Text, makeStyles} from '@
 import {StatusBar} from "expo-status-bar";
 import Toast from "react-native-toast-message";
 import {ThemedView} from "@/components/ThemedView";
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import {ModalProvider} from "@/providers/ModalProvider";
 
 
 type styleProps = {
@@ -24,34 +26,37 @@ export const ThemeChangeProvider = ({ children }: { children?: React.ReactNode }
     }, []);
 
     return (
-         <ThemedView style={[styles.wrapContainer, {margin: 'auto'}]}>
-            <SafeAreaView>
-                <StatusBar style={mode} />
-                <Toast />
-                {/*,  { backgroundColor: mode === "dark" ? darkColors.background : lightColors.background}*/}
-                <ThemedView style={[styles.container]}>
-                    <ThemedView style={[styles.viewWrapSwitch, styles.innerBlock, styles.topBlock, themeStyles.borderStyle]}>
-                        <ThemedView style={styles.viewSwitch}>
-                            <Text>Switch Color</Text>
-                            <Switch
-                                value={mode === "dark"}
-                                onValueChange={toggleSwitch}
-                            />
+        <SafeAreaProvider>
+             <ThemedView style={[styles.wrapContainer, {margin: 'auto'}]}>
+                <SafeAreaView>
+                    <StatusBar style={mode} />
+                    <Toast />
+                    <ThemedView style={[styles.container]}>
+                        <ThemedView style={[styles.viewWrapSwitch, styles.innerBlock, styles.topBlock, themeStyles.borderStyle]}>
+                            <ThemedView style={styles.viewSwitch}>
+                                <Text>Switch Color</Text>
+                                <Switch
+                                    value={mode === "dark"}
+                                    onValueChange={toggleSwitch}
+                                />
+                            </ThemedView>
+                        </ThemedView>
+                        <ThemedView style={[styles.innerBlock, styles.centerBlock, themeStyles.borderStyle]}>
+                            <ScrollView>
+                                <ScrollView horizontal={false}>
+                                    <ModalProvider>
+                                        {children}
+                                    </ModalProvider>
+                                </ScrollView>
+                            </ScrollView>
+                        </ThemedView>
+                        <ThemedView style={[styles.innerBlock, styles.bottomBlock, themeStyles.borderStyle ]}>
+                            <Text>Bottom Block</Text>
                         </ThemedView>
                     </ThemedView>
-                    <ThemedView style={[styles.innerBlock, styles.centerBlock, themeStyles.borderStyle]}>
-                        <ScrollView>
-                            <ScrollView horizontal={true}>
-                                {children}
-                            </ScrollView>
-                        </ScrollView>
-                    </ThemedView>
-                    <ThemedView style={[styles.innerBlock, styles.bottomBlock, themeStyles.borderStyle ]}>
-                        <Text>Bottom Block</Text>
-                    </ThemedView>
-                </ThemedView>
-             </SafeAreaView>
-        </ThemedView>
+                 </SafeAreaView>
+            </ThemedView>
+        </SafeAreaProvider>
     );
 };
 
@@ -105,6 +110,6 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderColor: 'red',
         borderWidth: 1,
-        width: '100%',
+        width: 520
     }
 });

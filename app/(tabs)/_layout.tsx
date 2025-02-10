@@ -148,6 +148,50 @@ export default function TabLayout() {
                 }}
             />
 
+            <Tabs.Screen
+                name="modal"
+                options={{
+                    title: 'Reset password',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: null
+                }}
+            />
+
+            <Tabs.Screen
+                name="animate"
+                options={{
+                    title: 'Reset password',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: '/(tabs)/modal'
+                }}
+            />
+
+            <Tabs.Screen
+                name="canvas"
+                options={{
+                    title: 'Canvas',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: '/(tabs)/canvas'
+                }}
+            />
+
+            <Tabs.Screen
+                name="board_screen"
+                options={{
+                    title: 'Canvas board',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? 'settings' : 'settings-outline'} color={color} size={24} />
+                    ),
+                    href: null
+                }}
+            />
+
         </Tabs>
     );
 }
