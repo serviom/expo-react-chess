@@ -10,10 +10,11 @@ import {
     setLastCodeMove,
     setLastMoveIsEnPassant,
     setNotice,
-    setPrevCell
+    setPrevCell,
+    resetGame
 } from "@/features/board/boardSlice";
 
-import {endGame as endGameControl, restartGame as restartGameControl, setFinish} from "@/features/control/controlSlice";
+import {endGame as endGameControl, restartGame as restartGameControl} from "@/features/control/controlSlice";
 
 import {
     CastleTypes,
@@ -133,8 +134,6 @@ const Chess: FC = () => {
             return;
         }
 
-
-
         setIsNext(checkIsNext());
         setIsLast(checkIsLast());
         setIsPrev(checkIsPrev());
@@ -148,7 +147,7 @@ const Chess: FC = () => {
 
             if (status) {
                 openModal(msg);
-                dispatch(setFinish(true));
+                dispatch(resetGame());
                 return;
             }
 
@@ -421,8 +420,6 @@ const Chess: FC = () => {
     }
 
     async function restartGame() {
-        startMoveTime.current = undefined;
-        spentTimeForMove.current = undefined;
         dispatch(restartGameControl());
         await init();
         setCurrentPlayer(whitePlayer);
@@ -816,7 +813,6 @@ const Chess: FC = () => {
                     showBestMove={showBestMove}
                     moveBestMove={moveBestMove}
                     bestMove={bestMove}
-                    spentTimeForMove={spentTimeForMove.current}
                     setModeBlackPlayer={setModeBlackPlayer}
                     modeBlackPlayer={modeBlackPlayer}
                     setModeWhitePlayer={setModeWhitePlayer}

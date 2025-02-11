@@ -37,8 +37,12 @@ const controlSlice = createSlice({
         restartGame: (state) => {
             state.start = true;
             state.analyze = false;
-            state.finish = false;
+        },
+        startGame: (state) => {
+            state.start = true;
+            state.analyze = false;
         }
+
     },
     extraReducers: (builder) => {},
 });

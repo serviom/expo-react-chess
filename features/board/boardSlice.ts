@@ -55,6 +55,11 @@ const boardSlice = createSlice({
         setAnalysisNotice: (state, action: {payload: moveTree, type: string }) => {
             state.analysis_notes = action.payload;
         },
+        resetGame: (state) => {
+            state.prevCell = null;
+            state.lastCell = null;
+            state.lastCodeMove = '';
+        }
     },
     extraReducers: (builder) => {
         // builder.addMatcher(
@@ -83,6 +88,7 @@ export const {
     setLastCodeMove,
     setNotice,
     setAnalysisNotice,
+    resetGame
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

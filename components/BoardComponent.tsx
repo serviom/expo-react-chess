@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useContext, useEffect, useImperativeHandle} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Board} from "../models/Board";
 import CellComponent from "./CellComponent";
 import {Cell} from "../models/Cell";
@@ -8,15 +8,13 @@ import {StyleSheet, Text, View} from "react-native";
 
 import {staticRefObject} from "./Chess";
 import {useSelector} from "react-redux";
-import {RootState, useAppDispatch} from "@/features/store";
+import {RootState} from "@/features/store";
 import {BoardState} from "@/features/board/boardSlice";
 
 import {PlayerTypes} from "@/constants";
 import {Player} from "@/types";
-import {PopupBoxSelectFigureComponent} from "@/components/PopupBoxSelectFigureComponent";
 import {makeCoordinateByLine} from "@/utils/board";
 import ModalComponent from "@/components/ModalComponent";
-import {useModal} from "@/providers/ModalProvider";
 import {useControl} from "@/providers/ControlProvider";
 
 export interface BoardProps {
@@ -38,14 +36,11 @@ export interface BoardProps {
 
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
-    const {board, currentPlayer, counter, analyze, currentMoveIsLast, isOpenedSelectFigure,
-        setIsOpenedSelectFigure, start, moveOnClick, setFigure, myState, updateBoard,
+    const {board, currentPlayer, currentMoveIsLast, start, moveOnClick, setFigure, myState, updateBoard,
         selectedCell, setSelectedCell} = props;
 
-    const dispatch = useAppDispatch();
     const boardState = useSelector((state: RootState) => state.board);
     const {rotate, cellSize} = useControl();
-    const {openModal} = useModal();
 
     // useImperativeHandle(ref, () => ({
     //     clearSelectedCell(): void  {
