@@ -1,7 +1,6 @@
 import React, {FC, useContext, useEffect, useRef, useState} from "react";
 import {Text, View} from "react-native";
 import {PlayerTypes} from "@/constants";
-import {getTimeInNumber, roundTime} from "@/utils/date";
 import {useControl} from "@/providers/ControlProvider";
 import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
@@ -9,12 +8,6 @@ import {BLACK_WON, WHITE_WON} from "@/models/Board";
 import {endGame, setFinish} from "@/features/control/controlSlice";
 import {useModal} from "@/providers/ModalProvider";
 
-// interface TimerProps  {
-//     finish: boolean;
-//     analyze: boolean;
-//     spentTimeForMove: number | undefined;
-//     start: boolean;
-// }
 
 interface TimerProps  {
 
@@ -31,8 +24,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
     const startMoveTime = useRef<number>(0);
     const spentTimeForMove = useRef<number>(0);
 
-    // const fullMatchTimeBlack = useRef<number>(matchTime);
-    // const fullMatchTimeWhite = useRef<number>(matchTime);
     const timer = useRef<null | ReturnType<typeof setInterval>>(null)
     const {currentPlayer} = useControl();
 
@@ -45,31 +36,12 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
             return;
         }
 
-        // if (startMoveTime.current) {
-        //     spentTimeForMove.current = getTimeInNumber() - startMoveTime.current;
-        // }
-        //
-        // startMoveTime.current = getTimeInNumber();
-        //
-        // if (spentTimeForMove.current) {
-        //     if (currentPlayer === PlayerTypes.BLACK) {
-        //         fullMatchTimeBlack.current = fullMatchTimeBlack.current - spentTimeForMove.current;
-        //         console.log('increase fullMatchTimeBlack');
-        //         setBlackTime(roundTime(fullMatchTimeBlack.current));
-        //     } else {
-        //         fullMatchTimeWhite.current = fullMatchTimeWhite.current - spentTimeForMove.current;
-        //         console.log('increase fullMatchTimeWhite');
-        //         setWhiteTime(roundTime(fullMatchTimeWhite.current));
-        //     }
-        // }
-
         if (currentPlayer) {
             if (timer.current) {
                 clearInterval(timer.current)
             }
             startTimer();
         }
-
 
         return () => {
             if (timer?.current !== null) {
@@ -142,8 +114,8 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
     return (
             start && (
             <View>
-                <Text>Чорні - {Math.round(blackTime / 1000)} сек.</Text>
-                <Text>Білі - {Math.round(whiteTime / 1000)} сек. </Text>
+                <Text>{`Чорні - ${Math.round(blackTime/1000)} сек.`}</Text>
+                <Text>{`Білі - ${Math.round(whiteTime/1000)} сек. `}</Text>
             </View>
         )
     )

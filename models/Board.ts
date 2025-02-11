@@ -7,9 +7,10 @@ import {Knight} from "./figures/Knight";
 import {Rook} from "./figures/Rook";
 import {Figure, FigureSides} from "./figures/Figure";
 import {Player, ValueOf} from "../types";
-import {getSystemCoordinateByInterByString, systemCoordinates} from "../utils/board";
+import {CastleTypes, getSystemCoordinateByInterByString, systemCoordinates} from "../utils/board";
 import {BoardState} from "@/features/board/boardSlice";
 import {PlayerTypes} from "@/constants";
+import {useRef} from "react";
 
 export const CastleOldKingСoordinates = {
     WHITE: "4,7",
@@ -42,6 +43,13 @@ const theEndStatus = {
     TYPE_DRAW: "draw",
     TYPE_WON : "won",
 } as const;
+
+
+const START_FEN_STRING_CASTLE = 'KQkq';
+const WHITE_SHORT_CASTLE_FEN = 'K';
+const WHITE_LONG_CASTLE_FEN = 'Q'
+const BLACK_SHORT_CASTLE_FEN = 'k';
+const BLACK_LONG_CASTLE_FEN = 'q'
 
 export type typeTheEndStatus = ValueOf<typeof theEndStatus>;
 
@@ -79,6 +87,69 @@ export class Board {
     numberOfCells: number = 8;
     blackFigures: Figure[] = [];
     whiteFigures: Figure[] = [];
+    // показує поточну позицію в дереві ходів для гри
+    counterMove: number = 0;
+    // показує поточну позицію в дереві ходів для аналізатора
+    counterAnalysisMove: number = 0;
+    // counterAnalysisMoveIncrease завжди збільшується на 1 при кожному новому кроці для аналізу
+    counterAnalysisMoveIncrease: number = 0;
+    // коли ми формуємо fen код для шахів ми передаємо строку кодування можливості рокировки
+    fenReportStringCastle: string = START_FEN_STRING_CASTLE;
+    // правило 50 ходів коли не ходять пішаком і не бють фігуру
+    ruleOf50Moves: number = 0;
+
+
+    public clearOpportunitiesCastleWhite() {
+        this.fenReportStringCastle = this.fenReportStringCastle.replace(WHITE_SHORT_CASTLE_FEN, '');
+        this.fenReportStringCastle = this.fenReportStringCastle.replace(WHITE_LONG_CASTLE_FEN, '');
+    }
+
+    public clearOpportunitiesCastleBlack() {
+        this.fenReportStringCastle = this.fenReportStringCastle.replace(BLACK_SHORT_CASTLE_FEN, '');
+        this.fenReportStringCastle = this.fenReportStringCastle.replace(BLACK_LONG_CASTLE_FEN, '');
+    }
+
+
+
+    public changeFenReportStringCastle(codeMove: string, currentPlayer: Player | null) {
+        if (this.fenReportStringCastle === '') {
+            return;
+        }
+
+        if (this.kingDidMove(PlayerTypes.WHITE)) {
+            this.clearOpportunitiesCastleWhite();
+        }
+
+        if (this.kingDidMove(PlayerTypes.BLACK)) {
+            this.clearOpportunitiesCastleBlack();
+        }
+
+        if (this.rookDidMove(PlayerTypes.WHITE, FigureSides.RIGHT)) {
+            this.fenReportStringCastle = this.fenReportStringCastle.replace(WHITE_SHORT_CASTLE_FEN, '');
+        }
+
+        if (this.rookDidMove(PlayerTypes.WHITE, FigureSides.LEFT)) {
+            this.fenReportStringCastle = this.fenReportStringCastle.replace(WHITE_LONG_CASTLE_FEN, '');
+        }
+
+        if (this.rookDidMove(PlayerTypes.BLACK, FigureSides.RIGHT)) {
+            this.fenReportStringCastle = this.fenReportStringCastle.replace(BLACK_LONG_CASTLE_FEN, '');
+        }
+
+        if (this.rookDidMove(PlayerTypes.BLACK, FigureSides.LEFT)) {
+            this.fenReportStringCastle = this.fenReportStringCastle.replace(BLACK_SHORT_CASTLE_FEN, '');
+        }
+
+        if (codeMove === CastleTypes.SHORT || codeMove === CastleTypes.LONG) {
+            if (currentPlayer === PlayerTypes.WHITE) {
+                this.clearOpportunitiesCastleWhite();
+            }
+
+            if (currentPlayer === PlayerTypes.BLACK) {
+                this.clearOpportunitiesCastleBlack();
+            }
+        }
+    }
 
     public initCells() {
         for (let i = 0; i < this.numberOfCells; i++) {
@@ -101,6 +172,11 @@ export class Board {
         newBoard.lostBlackFigures = this.lostBlackFigures;
         newBoard.whiteFigures = this.whiteFigures;
         newBoard.blackFigures = this.blackFigures;
+        newBoard.counterMove = this.counterMove;
+        newBoard.counterAnalysisMove = this.counterAnalysisMove;
+        newBoard.counterAnalysisMoveIncrease = this.counterAnalysisMoveIncrease;
+        newBoard.fenReportStringCastle = this.fenReportStringCastle;
+        newBoard.ruleOf50Moves = this.ruleOf50Moves;
         return newBoard;
     }
 

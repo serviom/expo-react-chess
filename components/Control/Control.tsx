@@ -11,26 +11,22 @@ import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
 
 interface ControlProps {
-    restart: () => void;
-    endGame: () => void;
+    // restart: () => void;
+    // endGame: () => void;
     // showBestMove: () => void;
     // moveBestMove: () => void;
     //bestMove: BestMove | undefined;
 }
 
 const Control: FC<ControlProps> = ({
-         restart, endGame,
+         // restart, endGame,
      }: ControlProps) => {
 
     const {pause} = useSelector((state: RootState) => state.control)
     const { mode, setMode, rotate, setRotate, setModeWhitePlayer, setModeBlackPlayer,
-        modeWhitePlayer, modeBlackPlayer } = useControl();
+        modeWhitePlayer, modeBlackPlayer, endGame, restartGame } = useControl();
 
     const dispatch = useAppDispatch();
-
-    const handleRestart = () => {
-        restart()
-    }
 
     function changeMode(selectedMode: number) {
         setMode(selectedMode);
@@ -50,14 +46,14 @@ const Control: FC<ControlProps> = ({
             <View>
                 <Button
                     title={'Restart game'}
-                    onPress={handleRestart}
+                    onPress={restartGame}
                 />
             </View>
 
             <View>
                 <Button
                     title={'Start game'}
-                    onPress={handleRestart}
+                    onPress={restartGame}
                 />
             </View>
 

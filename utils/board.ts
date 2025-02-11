@@ -376,6 +376,11 @@ export const fillMovesRecursive = (object: moveTree, id: number, moves: string[]
     return result;
 }
 
+export const changeRuleOf50Moves = (selectedCell: Cell, targetCell: Cell, board: any ): number => {
+    const mode = selectedCell.figure?.isPawn() || !targetCell.isEmpty();
+    return mode ? 0 : board.current.ruleOf50Moves + 1;
+}
+
 export const getEnPassantCell = (board: Board, boardState: BoardState): null | Cell => {
     if (boardState.lastMoveIsEnPassant === false || boardState.lastCell === null || boardState.prevCell === null) {
         return null;
@@ -548,6 +553,16 @@ export const getSystemCoordinateMoveByShort = (codeMove: string, board: Board, i
     initSystemMove.from.y = selectFigure.getCell().y;
 
     return initSystemMove;
+}
+
+
+export const moveIsEnPassant = (selectedCell: Cell, target: Cell): boolean => {
+    if (!selectedCell.figure || !target) {
+        return false;
+    }
+
+    return selectedCell.figure && selectedCell.figure.isPawn() && selectedCell.figure.isFirstStep === true
+        && Math.abs(target.y - selectedCell.y) === 2;
 }
 
 
