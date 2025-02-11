@@ -1,14 +1,14 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export interface ControlState {
-    start: boolean,
+    start: number,
     finish: boolean,
     pause: boolean,
     analyze: boolean,
 }
 
 const controlInitialState: ControlState = {
-    start: false,
+    start: 0,
     finish: false,
     pause: false,
     analyze: false,
@@ -18,8 +18,8 @@ const controlSlice = createSlice({
     name: 'control',
     initialState: controlInitialState,
     reducers: {
-        setStart: (state, action: {payload: boolean, type: string }) => {
-            state.start = action.payload;
+        setStart: (state) => {
+            state.start = state.start + 1;
         },
         setFinish: (state, action: {payload: boolean, type: string }) => {
             state.finish = action.payload;
@@ -31,15 +31,15 @@ const controlSlice = createSlice({
             state.pause = action.payload;
         },
         endGame: (state) => {
-            state.start = false;
+            state.start = 0;
             state.analyze = false;
         },
         restartGame: (state) => {
-            state.start = true;
+            state.start =  state.start + 1;
             state.analyze = false;
         },
         startGame: (state) => {
-            state.start = true;
+            state.start = 1;
             state.analyze = false;
         }
 

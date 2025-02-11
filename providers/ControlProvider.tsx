@@ -10,10 +10,10 @@ interface ChessControlContextProps {
     setRotate: (val: boolean) => void
     currentPlayer: Player | null;
     setCurrentPlayer: (val: Player | null) => void,
-    // modeWhitePlayer: SingleValue<ISelectOption>,
-    // modeBlackPlayer: SingleValue<ISelectOption>,
-    // setModeWhitePlayer: (val: SingleValue<ISelectOption>) => void,
-    // setModeBlackPlayer: (val: SingleValue<ISelectOption>) => void,
+    modeWhitePlayer: SingleValue<ISelectOption>,
+    modeBlackPlayer: SingleValue<ISelectOption>,
+    setModeWhitePlayer: (val: SingleValue<ISelectOption>) => void,
+    setModeBlackPlayer: (val: SingleValue<ISelectOption>) => void,
     cellSize: number;
 }
 
@@ -26,8 +26,8 @@ export const ControlProvider = ({ children } : { children: React.ReactNode }) =>
     const [mode, setMode] = useState<number>(MODE);
     const [rotate, setRotate] = useState<boolean>(ROTATE);
     const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-    //const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
-    //const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
+    const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
+    const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
     const [cellSize, setCellSize] = useState<number>(CELL_SIZE);
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export const ControlProvider = ({ children } : { children: React.ReactNode }) =>
     }, [width]);
 
     return (
-        <ControlContext.Provider value={{ cellSize, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
+        <ControlContext.Provider value={{setModeWhitePlayer, setModeBlackPlayer, modeWhitePlayer, modeBlackPlayer, cellSize, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
             {children}
         </ControlContext.Provider>
     );

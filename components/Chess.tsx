@@ -48,6 +48,7 @@ import {NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
 import Control from "@/components/Control/Control";
 import {useControl} from "@/providers/ControlProvider";
 import {useModal} from "@/providers/ModalProvider";
+import {PopupBoxSelectFigureComponent} from "@/components/PopupBoxSelectFigureComponent";
 
 const START_COUNTER = 0;
 const START_FEN_STRING_CASTLE = 'KQkq';
@@ -73,21 +74,22 @@ export const initialStaticRefObject = {
 }
 
 const Chess: FC = () => {
-    const [pgn, setPgn] = useState(''); // Declare a state variable...
-    const [board, setBoard] = useState(new Board());
+    // const [pgn, setPgn] = useState('');
+
+    const board = useRef(new Board());
+
     const {start, analyze, finish, pause} = useSelector((state: RootState) => state.control)
+
+    const boardState = useSelector((state: RootState) => state.board);
+
     const dispatch = useAppDispatch();
 
-    const [isOpenedSelectFigure, setIsOpenedSelectFigure] = useState(false);
+    // const [isOpenedSelectFigure, setIsOpenedSelectFigure] = useState(false);
 
     const whitePlayer = PlayerTypes.WHITE;
     const blackPlayer = PlayerTypes.BLACK;
 
-    const {currentPlayer, setCurrentPlayer} = useControl();
-
-    const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
-    const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
-
+    const {currentPlayer, setCurrentPlayer, modeWhitePlayer, modeBlackPlayer} = useControl();
 
     // показує поточну позицію в дереві ходів для гри
     const counterMove = useRef<number>(START_COUNTER);
@@ -103,16 +105,15 @@ const Chess: FC = () => {
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
     //const childRef = useRef<any>(null);
 
-    const boardState = useSelector((state: RootState) => state.board);
 
     let myState = useRef<staticRefObject>(initialStaticRefObject);
 
-    const [isNext, setIsNext] = useState<boolean>(false);
-    const [isLast, setIsLast] = useState<boolean>(false);
-    const [isPrev, setIsPrev] = useState<boolean>(false);
-    const [isFirst, setIsFirst] = useState<boolean>(false);
+    // const [isNext, setIsNext] = useState<boolean>(false);
+    // const [isLast, setIsLast] = useState<boolean>(false);
+    // const [isPrev, setIsPrev] = useState<boolean>(false);
+    // const [isFirst, setIsFirst] = useState<boolean>(false);
 
-    const [bestMove, setBestMove] = useState<BestMove | undefined>(undefined);
+    // const [bestMove, setBestMove] = useState<BestMove | undefined>(undefined);
 
     const {openModal} = useModal();
 
@@ -121,29 +122,30 @@ const Chess: FC = () => {
         init();
     }, []);
 
-    useEffect(() => {
-        if (bestMove !== undefined && pause === false && analyze === false) {
-            setSelectedCell(board.getCellByInterCoordinate(bestMove.from));
-            moveOnClick(board.getCellByInterCoordinate(bestMove.from),
-                board.getCellByInterCoordinate(bestMove.to), bestMove.promotion);
-        }
-    }, [bestMove]);
+    // useEffect(() => {
+    //     if (bestMove !== undefined && pause === false && analyze === false) {
+    //         setSelectedCell(board.current.getCellByInterCoordinate(bestMove.from));
+    //         moveOnClick(board.current.getCellByInterCoordinate(bestMove.from),
+    //             board.current.getCellByInterCoordinate(bestMove.to), bestMove.promotion);
+    //     }
+    // }, [bestMove]);
 
     useEffect(() => {
         if (!currentPlayer) {
             return;
         }
 
-        setIsNext(checkIsNext());
-        setIsLast(checkIsLast());
-        setIsPrev(checkIsPrev());
-        setIsFirst(checkIsFirst());
 
-        setBestMove(undefined);
+        // setIsNext(checkIsNext());
+        // setIsLast(checkIsLast());
+        // setIsPrev(checkIsPrev());
+        // setIsFirst(checkIsFirst());
+
+        // setBestMove(undefined);
 
         // кінець ігри
         if (!analyze && start && !finish) {
-            const {status, msg} = board.theEnd(currentPlayer);
+            const {status, msg} = board.current.theEnd(currentPlayer);
 
             if (status) {
                 openModal(msg);
@@ -170,12 +172,12 @@ const Chess: FC = () => {
     }, [pause]);
 
 
-    useEffect(() => {
-        if (start) {
-            setPgn('');
-        }
-
-    }, [start]);
+    // useEffect(() => {
+    //     if (start) {
+    //         setPgn('');
+    //     }
+    //
+    // }, [start]);
 
     function getAnalysisDeep() {
         const currentMoveTree = searchItemForAnalysisById(boardState.analysis_notes, counterAnalysisMove.current);
@@ -203,7 +205,7 @@ const Chess: FC = () => {
 
     function moveBestMove() {
         getBestmoveByStockfish(fen(analyze ? getAnalysisDeep() : counterMove.current + 1)).then((result: any) => {
-            setBestMove(result);
+            //setBestMove(result);
         });
     }
 
@@ -290,8 +292,8 @@ const Chess: FC = () => {
     }
 
     function updateBoard() {
-        const newBoard = board.getCopyBoard();
-        setBoard(newBoard)
+        const newBoard = board.current.getCopyBoard();
+        board.current = newBoard;
     }
 
     function setFigure(FigureName: typeFenFigureSign) {
@@ -306,12 +308,12 @@ const Chess: FC = () => {
 
         if (FenFigureSign.QUEEN === FigureName) {
             targetCell.addLostFigure();
-            board.addFigureToArray(new Queen(targetCell.figure.color, targetCell, FigureSides.ADDITIONAL));
+            board.current.addFigureToArray(new Queen(targetCell.figure.color, targetCell, FigureSides.ADDITIONAL));
         }
 
         if (FenFigureSign.KNIGHT === FigureName) {
             targetCell.addLostFigure();
-            board.addFigureToArray(new Knight(targetCell.figure.color, targetCell, FigureSides.ADDITIONAL));
+            board.current.addFigureToArray(new Knight(targetCell.figure.color, targetCell, FigureSides.ADDITIONAL));
         }
 
         const lastCodeMove = getPruningCoordinateMove(boardState, selectedCell, targetCell, selectedFigure, opponentFigure);
@@ -320,7 +322,7 @@ const Chess: FC = () => {
     }
 
     function unmarkEnPassantFigure() {
-        const cell = getEnPassantCell(board, boardState);
+        const cell = getEnPassantCell(board.current, boardState);
         if (cell !== null) {
             cell.enPassantFigure = false;
         }
@@ -366,7 +368,7 @@ const Chess: FC = () => {
         }
 
         if (targetCell.figure?.isPawn() && targetCell.isLastLineForTransforming(selectedFigure.color)) {
-            setIsOpenedSelectFigure(true);
+            //setIsOpenedSelectFigure(true);
             return;
         }
 
@@ -387,11 +389,11 @@ const Chess: FC = () => {
             return '';
         }
 
-        let fen = board.partBoardFen();
+        let fen = board.current.partBoardFen();
 
         fen += ' ' + getColorPlayerForFen(currentPlayer) + ' ' + (fenReportStringCastle.current === '' ? '-' : fenReportStringCastle.current);
 
-        const enPassantCell = getEnPassantCell(board, boardState);
+        const enPassantCell = getEnPassantCell(board.current, boardState);
 
         fen += ' ' + (enPassantCell !== null ? enPassantCell.interCoordinate : '-');
 
@@ -409,7 +411,7 @@ const Chess: FC = () => {
 
     async function init() {
         await clearNotice();
-        setBoard(initNewBoard());
+        board.current = initNewBoard();
         counterMove.current = 0;
     }
 
@@ -440,27 +442,27 @@ const Chess: FC = () => {
             return;
         }
 
-        if (board.kingDidMove(PlayerTypes.WHITE)) {
+        if (board.current.kingDidMove(PlayerTypes.WHITE)) {
             clearOpportunitiesCastleWhite();
         }
 
-        if (board.kingDidMove(PlayerTypes.BLACK)) {
+        if (board.current.kingDidMove(PlayerTypes.BLACK)) {
             clearOpportunitiesCastleBlack();
         }
 
-        if (board.rookDidMove(PlayerTypes.WHITE, FigureSides.RIGHT)) {
+        if (board.current.rookDidMove(PlayerTypes.WHITE, FigureSides.RIGHT)) {
             fenReportStringCastle.current = fenReportStringCastle.current.replace(WHITE_SHORT_CASTLE_FEN, '');
         }
 
-        if (board.rookDidMove(PlayerTypes.WHITE, FigureSides.LEFT)) {
+        if (board.current.rookDidMove(PlayerTypes.WHITE, FigureSides.LEFT)) {
             fenReportStringCastle.current = fenReportStringCastle.current.replace(WHITE_LONG_CASTLE_FEN, '');
         }
 
-        if (board.rookDidMove(PlayerTypes.BLACK, FigureSides.RIGHT)) {
+        if (board.current.rookDidMove(PlayerTypes.BLACK, FigureSides.RIGHT)) {
             fenReportStringCastle.current = fenReportStringCastle.current.replace(BLACK_LONG_CASTLE_FEN, '');
         }
 
-        if (board.rookDidMove(PlayerTypes.BLACK, FigureSides.LEFT)) {
+        if (board.current.rookDidMove(PlayerTypes.BLACK, FigureSides.LEFT)) {
             fenReportStringCastle.current = fenReportStringCastle.current.replace(BLACK_SHORT_CASTLE_FEN, '');
         }
 
@@ -696,7 +698,7 @@ const Chess: FC = () => {
             }
         });
 
-        setBoard(newBoard);
+        board.current = newBoard;
         counterAnalysisMove.current = step;
 
         setCurrentPlayer(isBlackMove(moves.length) ? whitePlayer : blackPlayer);
@@ -737,7 +739,7 @@ const Chess: FC = () => {
             return;
         }
 
-        const newBoard = step < counterMove.current ? initNewBoard() : board.getCopyBoard();
+        const newBoard = step < counterMove.current ? initNewBoard() : board.current.getCopyBoard();
 
         if (step < counterMove.current) {
             counterMove.current = 0;
@@ -752,7 +754,7 @@ const Chess: FC = () => {
             }
         }
 
-        setBoard(newBoard);
+        board.current = newBoard;
         setCurrentPlayer(isBlackMove(counterMove.current) ? whitePlayer : blackPlayer);
     }
 
@@ -782,7 +784,7 @@ const Chess: FC = () => {
     // }
 
     const props: BoardProps = {
-        board,
+        currentBoard: board,
         currentPlayer,
         counter: counterMove.current,
         analyze,
@@ -794,8 +796,8 @@ const Chess: FC = () => {
         myState,
         selectedCell,
         setSelectedCell,
-        isOpenedSelectFigure,
-        setIsOpenedSelectFigure
+        // isOpenedSelectFigure,
+        // setIsOpenedSelectFigure
     }
 
     function getSeconds() {
@@ -810,13 +812,9 @@ const Chess: FC = () => {
                 <Control
                     restart={restartGame}
                     endGame={endGame}
-                    showBestMove={showBestMove}
-                    moveBestMove={moveBestMove}
-                    bestMove={bestMove}
-                    setModeBlackPlayer={setModeBlackPlayer}
-                    modeBlackPlayer={modeBlackPlayer}
-                    setModeWhitePlayer={setModeWhitePlayer}
-                    modeWhitePlayer={modeWhitePlayer}
+                    // showBestMove={showBestMove}
+                    // moveBestMove={moveBestMove}
+                    //bestMove={bestMove}
                 />
             </View>
             <View>
@@ -825,6 +823,12 @@ const Chess: FC = () => {
                 {/*/>*/}
             </View>
             <View>
+                {/*<PopupBoxSelectFigureComponent*/}
+                {/*    isOpenedSelectFigure={isOpenedSelectFigure}*/}
+                {/*    setIsOpenedSelectFigure={setIsOpenedSelectFigure}*/}
+                {/*    targetCell={myState.current?.targetCell}*/}
+                {/*    setFigure={setFigure}*/}
+                {/*/>*/}
                 <BoardComponent  {...props} />
                 <View>
                     {/*<LostFigures*/}

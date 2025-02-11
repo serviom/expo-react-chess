@@ -13,23 +13,18 @@ import {RootState, useAppDispatch} from "@/features/store";
 interface ControlProps {
     restart: () => void;
     endGame: () => void;
-    showBestMove: () => void;
-    moveBestMove: () => void;
-    bestMove: BestMove | undefined;
-    modeWhitePlayer: SingleValue<ISelectOption>;
-    setModeWhitePlayer: (val: SingleValue<ISelectOption>) => void;
-    modeBlackPlayer: SingleValue<ISelectOption>;
-    setModeBlackPlayer: (val: SingleValue<ISelectOption>) => void;
+    // showBestMove: () => void;
+    // moveBestMove: () => void;
+    //bestMove: BestMove | undefined;
 }
 
 const Control: FC<ControlProps> = ({
-         restart, endGame, showBestMove,
-         bestMove, moveBestMove, setModeWhitePlayer, setModeBlackPlayer,
-         modeWhitePlayer, modeBlackPlayer
+         restart, endGame,
      }: ControlProps) => {
 
     const {pause} = useSelector((state: RootState) => state.control)
-    const { mode, setMode, rotate, setRotate } = useControl();
+    const { mode, setMode, rotate, setRotate, setModeWhitePlayer, setModeBlackPlayer,
+        modeWhitePlayer, modeBlackPlayer } = useControl();
 
     const dispatch = useAppDispatch();
 
@@ -138,26 +133,26 @@ const Control: FC<ControlProps> = ({
                 </View>
             </View>
 
-            <View>
-                <Button
-                    title={'Move Best Move'}
-                    onPress={moveBestMove}
-                />
-            </View>
+            {/*<View>*/}
+            {/*    <Button*/}
+            {/*        title={'Move Best Move'}*/}
+            {/*        onPress={moveBestMove}*/}
+            {/*    />*/}
+            {/*</View>*/}
 
-            <View>
-                <Button
-                    disabled={bestMove !== undefined}
-                    title={'Show Best Move'}
-                    onPress={showBestMove}
-                />
-                {
-                    bestMove !== undefined &&
-                    <View>
-                        <Text>{'From: ' + bestMove.from + ' -> ' + bestMove.to + (bestMove.promotion ? ' | promo: ' + bestMove.promotion : '')}</Text>
-                    </View>
-                }
-            </View>
+            {/*<View>*/}
+            {/*    <Button*/}
+            {/*        disabled={bestMove !== undefined}*/}
+            {/*        title={'Show Best Move'}*/}
+            {/*        onPress={showBestMove}*/}
+            {/*    />*/}
+            {/*    {*/}
+            {/*        bestMove !== undefined &&*/}
+            {/*        <View>*/}
+            {/*            <Text>{'From: ' + bestMove.from + ' -> ' + bestMove.to + (bestMove.promotion ? ' | promo: ' + bestMove.promotion : '')}</Text>*/}
+            {/*        </View>*/}
+            {/*    }*/}
+            {/*</View>*/}
             <View>
                 <Button
                     title={pause ? 'Pause on' : 'Pause off'}

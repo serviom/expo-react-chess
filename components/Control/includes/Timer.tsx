@@ -20,7 +20,7 @@ interface TimerProps  {
 
 }
 
-const matchTime = 20 * 1000; // seconds * 1000
+const matchTime = 300 * 1000; // seconds * 1000
 const stepTime = 50; // ms
 
 const Timer: FC<TimerProps> = ({} : TimerProps) => {
@@ -73,7 +73,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
 
         return () => {
             if (timer?.current !== null) {
-                console.log('Clear timeout in currentPlayer');
                 clearTimeout(timer.current);
             }
             timer.current = null;
@@ -115,7 +114,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
     useEffect(() => {
         // End game
         if (!start) {
-            console.log('end game');
             if (timer.current) {
                 clearInterval(timer.current)
             }
@@ -124,7 +122,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
 
         // Start game
         if (start) {
-            console.log('start game');
             if (timer.current) {
                 clearInterval(timer.current)
             }

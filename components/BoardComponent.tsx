@@ -18,9 +18,9 @@ import ModalComponent from "@/components/ModalComponent";
 import {useControl} from "@/providers/ControlProvider";
 
 export interface BoardProps {
-    board: Board;
-    isOpenedSelectFigure: boolean;
-    setIsOpenedSelectFigure: (state: boolean) => void;
+    currentBoard: any;
+    // isOpenedSelectFigure: boolean;
+    // setIsOpenedSelectFigure: (state: boolean) => void;
     currentPlayer: Player | null;
     counter: number;
     analyze: boolean;
@@ -36,8 +36,10 @@ export interface BoardProps {
 
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
-    const {board, currentPlayer, currentMoveIsLast, start, moveOnClick, setFigure, myState, updateBoard,
+    const {currentBoard, currentPlayer, currentMoveIsLast, start, moveOnClick, setFigure, myState, updateBoard,
         selectedCell, setSelectedCell} = props;
+
+    const board = currentBoard.current;
 
     const boardState = useSelector((state: RootState) => state.board);
     const {rotate, cellSize} = useControl();
@@ -144,16 +146,10 @@ const BoardComponent = (props: BoardProps) => {
                 {/*<View style={styles.markingHorWrap}>*/}
                     {/* Board */}
                     <View style={styles.wrapBoard}>
-                        {/*<PopupBoxSelectFigureComponent*/}
-                        {/*    isOpenedSelectFigure={isOpenedSelectFigure}*/}
-                        {/*    setIsOpenedSelectFigure={setIsOpenedSelectFigure}*/}
-                        {/*    targetCell={myState.current?.targetCell}*/}
-                        {/*    setFigure={setFigure}*/}
-                        {/*/>*/}
                         <View style={styles.board}>
-                            {board.cells.map((row, colIndex) => (
+                            {board.cells.map((row: any, colIndex: any) => (
                                 <View key={`col-${colIndex}`} style={styles.wrapCell}>
-                                    {row.map((cell, rowIndex) => (
+                                    {row.map((cell: any, rowIndex: any) => (
                                         <CellComponent
                                             isHighlightPrev={boardState.prevCell !== null &&
                                                 cell.coordinateByLine === makeCoordinateByLine(boardState.prevCell.x, boardState.prevCell.y)}

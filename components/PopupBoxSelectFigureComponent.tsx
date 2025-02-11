@@ -1,10 +1,9 @@
-import React, {FC, useContext, useState} from 'react';
+import React, {FC} from 'react';
 import {typeFenFigureSign, FenFigureSign} from "../models/figures/Figure";
-import {ChessContext} from "./Chess";
 import {Cell} from "../models/Cell";
 
-
 import {PlayerTypes} from "@/constants";
+import {useControl} from "@/providers/ControlProvider";
 
 interface PopupBoxSelectFigureProps {
     setFigure: (FigureName: typeFenFigureSign) => void,
@@ -20,7 +19,7 @@ export const PopupBoxSelectFigureComponent: FC<PopupBoxSelectFigureProps> = ({ i
         setFigure(FigureName);
     }
 
-    const {mode} = useContext(ChessContext);
+    const {mode} = useControl();
 
     return (
         <div className={'box' + (isOpenedSelectFigure ? ' pointer-event-auto' : '') }>
