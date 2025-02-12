@@ -3,14 +3,17 @@ import React from 'react';
 import {ThemeChangeProvider} from "@/providers/ThemeChangeProvider";
 import Chess from "../../components/Chess";
 import {ControlProvider} from "@/providers/ControlProvider";
+import {CountersProvider} from "@/providers/CountersProvider";
 
 const PlayScreen = ()=> {
 
     return (
         <ThemeChangeProvider>
-            <ControlProvider>
-                <Chess />
-            </ControlProvider>
+            <CountersProvider>
+                <ControlProvider>
+                    <Chess/>
+                </ControlProvider>
+            </CountersProvider>
         </ThemeChangeProvider>
     );
 }

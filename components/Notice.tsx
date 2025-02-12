@@ -6,10 +6,11 @@ import {
     setNotice,
     setPrevCell
 } from "@/features/board/boardSlice";
-import {setStart, setAnalyze} from "@/features/control/controlSlice";
+import {setAnalyze, setStart} from "@/features/control/controlSlice";
 import {NoticeMove} from "./includes/NoticeMove";
 import {
-    CastleTypes, changeRuleOf50Moves,
+    CastleTypes,
+    changeRuleOf50Moves,
     END_GAME,
     fillMovesRecursive,
     getSystemCoordinateMoveByShort,
@@ -32,6 +33,7 @@ import {KEY_NOTES_LOCAL_STORAGE, NOTES_LOCAL_STORAGE, PlayerTypes, VALUE_NOTES_L
 import {Player} from "@/types";
 import {useControl} from "@/providers/ControlProvider";
 import {Board} from "@/models/Board";
+import {useCounters} from "@/providers/CountersProvider";
 
 export interface NoticeProps {}
 
@@ -50,7 +52,11 @@ const getStyle = (isActive: boolean) => {
 
 const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     const [pgn, setPgn] = useState('');
-    const {currentPlayer, board, selectedCell, setSelectedCell, initNewBoard, setCurrentPlayer} = useControl();
+    const {currentPlayer, selectedCell, setSelectedCell, setCurrentPlayer} = useControl();
+
+    const {board, counterMove, ruleOf50Moves, fenReportStringCastle,
+        counterAnalysisMoveIncrease, setCounterAnalysisMoveIncrease, counterAnalysisMove, setCounterAnalysisMove,
+        setRuleOf50Moves, setCounterMove, setFenReportStringCastle} = useCounters();
 
     const [isNext, setIsNext] = useState<boolean>(false);
     const [isLast, setIsLast] = useState<boolean>(false);
@@ -82,16 +88,29 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         return notice.length;
     }
 
+    function initNewBoard() {
+        board.current.reset();
+        dispatch(setLastMoveIsEnPassant(false));
+    }
+    //
+    // function initNewBoard(): Board {
+    //     const newBoard = new Board();
+    //     newBoard.initCells();
+    //     newBoard.addFigures();
+    //     dispatch(setLastMoveIsEnPassant(false));
+    //     return newBoard;
+    // }
+
     function checkIsNext() {
         if (!analyze) {
-            return board.current.counterMove !== numberOfLastMove();
+            return counterMove.current !== numberOfLastMove();
         }
 
-        if (board.current.counterAnalysisMove === board.current.counterAnalysisMoveIncrease) {
+        if (counterAnalysisMove.current === counterAnalysisMoveIncrease.current) {
             return false;
         }
 
-        const currentMoveTree = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove);
+        const currentMoveTree = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current);
 
         if (!currentMoveTree) {
             throw new Error('currentMoveTree is null');
@@ -103,7 +122,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
 
         if (currentMoveTree.children.length > 1) {
             // якщо наступний крок це основна цепочка по якій була розіграна шахматна гра тоді він завжди доступний
-            const currentMoveNextTree = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove + 1);
+            const currentMoveNextTree = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current + 1);
             if (currentMoveNextTree && currentMoveNextTree.index === 0) {
                 return true;
             }
@@ -114,11 +133,11 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }
 
     function checkIsLast() {
-        return analyze ? getLastIdMove() === board.current.counterAnalysisMove : numberOfLastMove() === board.current.counterMove;
+        return analyze ? getLastIdMove() === counterAnalysisMove.current : numberOfLastMove() === counterMove.current;
     }
 
     function getLastIdMove(): number | null {
-        const currentMoveTree = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove);
+        const currentMoveTree = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current);
         if (!currentMoveTree) {
             throw new Error('currentMoveTree is null');
         }
@@ -126,19 +145,19 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }
 
     function checkIsPrev() {
-        return analyze ? board.current.counterAnalysisMove !== 1 : board.current.counterMove !== 1;
+        return analyze ? counterAnalysisMove.current !== 1 : counterMove.current !== 1;
     }
 
     function checkIsFirst() {
         if (!analyze) {
-            return board.current.counterMove === 1;
+            return counterMove.current === 1;
         }
 
-        if (board.current.counterAnalysisMove === 1) {
+        if (counterAnalysisMove.current === 1) {
             return true;
         }
 
-        const currentMoveTree = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove);
+        const currentMoveTree = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current);
 
         if (!currentMoveTree) {
             throw new Error('currentMoveTree is null');
@@ -160,19 +179,19 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }
 
     function currentMoveIsLast(): boolean {
-        return notice.length === board.current.counterMove;
+        return notice.length === counterMove.current;
     }
 
     function currentMoveAnalysisIsLast(): boolean {
-        return notice.length === board.current.counterAnalysisMove;
+        return notice.length === counterAnalysisMove.current;
     }
 
     function getNextAnalysisStep() {
-        return board.current.counterAnalysisMove;
+        return counterAnalysisMove.current
     }
 
     function getPrevAnalysisStep() {
-        const currentTreeMove = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove);
+        const currentTreeMove = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current);
 
         if (!currentTreeMove || currentTreeMove.deep < 1 || currentTreeMove.id < 1) {
             throw new Error('currentTreeMove is null');
@@ -192,7 +211,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }
 
     function getFirstAnalysisStep() {
-        const currentTreeMove = searchItemForAnalysisById(analysis_notes, board.current.counterAnalysisMove);
+        const currentTreeMove = searchItemForAnalysisById(analysis_notes, counterAnalysisMove.current);
 
         if (!currentTreeMove) {
             throw new Error('currentTreeMove is null');
@@ -225,7 +244,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     function prevMove(): void {
         clearSelectedCell();
 
-        const newStep = analyze ? getPrevAnalysisStep() : board.current.counterMove - 1;
+        const newStep = analyze ? getPrevAnalysisStep() : counterMove.current - 1;
 
         console.log('prevMove newStep', newStep);
         if (newStep === 0) {
@@ -261,7 +280,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
             return;
         }
 
-        const newStep = analyze ? getNextAnalysisStep() : board.current.counterMove + 1;
+        const newStep = analyze ? getNextAnalysisStep() : counterMove.current + 1;
 
         console.log('newStep', newStep);
         wrapGoToStep(newStep);
@@ -276,51 +295,46 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }
 
     function loadAnalyze(position: number): void {
-        board.current.counterAnalysisMoveIncrease = position;
-        goToAnalysisEnd();
-    }
-
-    function goToAnalysisEnd() {
+        setCounterAnalysisMoveIncrease(position);
         clearSelectedCell();
-        goToAnalysisStep(board.current.counterAnalysisMoveIncrease);
+        goToAnalysisStep(position);
     }
 
     function incrementCounter() {
-        board.current.counterMove = board.current.counterMove + 1;
+        setCounterMove(counterMove.current + 1);
     }
 
     function goToStep(step: number): void {
         clearSelectedCell();
-        if (step === board.current.counterMove) {
+        if (step === counterMove.current) {
             return;
         }
 
-        console.log('board.current.counterMove', board.current.counterMove);
+        console.log('board.current.counterMove', counterMove.current);
 
-        const newBoard = step < board.current.counterMove ? initNewBoard() : board.current.getCopyBoard();
+        //const newBoard = step < board.current.counterMove ? initNewBoard() : board.current.getCopyBoard();
 
-        debugger
-
-        if (step < board.current.counterMove) {
-            board.current.counterMove = 0;
+        if (step < counterMove.current) {
+            board.current.reset();
+            setCounterMove(0);
         }
 
-        while (board.current.counterMove < step) {
+        while (counterMove.current < step) {
             incrementCounter();
-            const codeMove = notice[board.current.counterMove - 1] ?? '';
+            const codeMove = notice[counterMove.current - 1] ?? '';
 
             if (codeMove && codeMove !== END_GAME) {
-                wrapOneMoveForNotice(codeMove, newBoard, isBlackMove(board.current.counterMove));
+                wrapOneMoveForNotice(codeMove, board.current, isBlackMove(counterMove.current));
             }
         }
 
-        board.current = newBoard;
-        setCurrentPlayer(isBlackMove(board.current.counterMove) ? PlayerTypes.WHITE : PlayerTypes.BLACK);
+        setCurrentPlayer(isBlackMove(counterMove.current) ? PlayerTypes.WHITE : PlayerTypes.BLACK);
     }
 
     function wrapOneMoveForNotice(codeMove: string, board: Board, isBlack: boolean): void {
-
+        board.setFenReportStringCastle(fenReportStringCastle.current);
         board.changeFenReportStringCastle(codeMove, currentPlayer);
+        setFenReportStringCastle(board.getFenReportStringCastle());
 
         if (codeMove === CastleTypes.LONG || codeMove === CastleTypes.SHORT) {
             board.castleMove(isBlack, codeMove === CastleTypes.LONG);
@@ -335,14 +349,10 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         }
 
         const cellNext = board.getCell(moveCoordinate.to.x, moveCoordinate.to.y);
-
-        board.ruleOf50Moves = changeRuleOf50Moves(cellPrev, cellNext, board);
-
+        setRuleOf50Moves(changeRuleOf50Moves(cellPrev, cellNext, board));
         cellPrev.figure.moveFigure(cellNext);
         oneAnalysisMove(cellPrev, cellNext, moveCoordinate, codeMove, board, isBlack);
-
         const switchEnPassant = moveIsEnPassant(cellPrev, cellNext);
-
         dispatch(setLastMoveIsEnPassant(switchEnPassant));
         dispatch(setPrevCell(cellPrev.getCellInfo()));
         dispatch(setLastCell(cellNext.getCellInfo()));
@@ -355,26 +365,24 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         const lastObject = fillMovesRecursive(notes, step, moves);
 
         clearSelectedCell();
-        const newBoard = initNewBoard();
+        initNewBoard();
 
         moves.forEach((codeMove, index) => {
             if (codeMove && codeMove !== END_GAME) {
-                wrapOneMoveForNotice(codeMove, newBoard, isBlackMove(index + 1));
+                wrapOneMoveForNotice(codeMove, board.current, isBlackMove(index + 1));
             }
         });
 
-        board.current = newBoard;
-        board.current.counterAnalysisMove = step;
-
+        setCounterAnalysisMove(step);
         setCurrentPlayer(isBlackMove(moves.length) ? PlayerTypes.WHITE : PlayerTypes.BLACK);
     }
 
     function currentMove(step: number): boolean {
-        return step === board.current.counter;
+        return step === counterMove.current
     }
 
     function analysisCurrentMove(step: number): boolean {
-        return step === board.current.counterAnalysisMove;
+        return step === counterAnalysisMove.current
     }
 
     function addMovesToArray(moves: string, codesInArray: string[]) {

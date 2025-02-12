@@ -165,7 +165,7 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
           activeOpacity={0.7}
       >
         <View style={styles.image_container}>
-          <Text>{getSeconds()}</Text>
+          {/*<Text>{getSeconds()}</Text>*/}
           {/* Відображення доступної клітинки (без фігури) */}
           {available && !isFigure && <View style={styles.available} />}
           {!isFigure && showHorizontalNumberCell }

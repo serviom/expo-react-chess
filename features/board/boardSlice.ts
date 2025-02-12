@@ -1,6 +1,7 @@
 import {moveTree} from "../../components/Notice";
 import {createSlice} from '@reduxjs/toolkit';
 import {CellInfo} from "@/types";
+import {Cell} from "@/models/Cell";
 
 export interface BoardState {
     lastMoveIsEnPassant: boolean,
@@ -8,7 +9,8 @@ export interface BoardState {
     lastCell: CellInfo | null,
     lastCodeMove: string,
     notice: string[],
-    analysis_notes: moveTree
+    analysis_notes: moveTree,
+    cells: Cell[][];
 }
 
 export interface analysisMovesPayload {
@@ -30,6 +32,7 @@ const boardInitialState: BoardState = {
     analysis_notes: {} as moveTree,
     prevCell: null,
     lastCell: null,
+    cells: []
 }
 
 const boardSlice = createSlice({
@@ -59,7 +62,10 @@ const boardSlice = createSlice({
             state.prevCell = null;
             state.lastCell = null;
             state.lastCodeMove = '';
-        }
+        },
+        setCell: (state, action: {payload: Cell[], type: string }) => {
+            state.cells.push(action.payload);
+        },
     },
     extraReducers: (builder) => {
         // builder.addMatcher(

@@ -51,3 +51,7 @@ export interface CellInfo {
     figure: FigureNameEn | null;
     color: Player | null;
 }
+
+export interface RefMyObject<T> extends React.RefObject<T> {
+    readonly current: T
+}

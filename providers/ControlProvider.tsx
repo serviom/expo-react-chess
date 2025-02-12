@@ -1,13 +1,13 @@
-import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {CELL_SIZE, MODE, NOTES_LOCAL_STORAGE, PlayerTypes, ROTATE} from "@/constants";
 import {initialStateModePlayerOptions, ISelectOption, Player, SingleValue} from "@/types";
 import {useWindowDimensions} from "react-native";
-import {endGame as endGameControl, restartGame as restartGameControl} from "@/features/control/controlSlice";
+import {endGame, restartGame} from "@/features/control/controlSlice";
 import {useAppDispatch} from "@/features/store";
-import {setLastMoveIsEnPassant, setNotice} from "@/features/board/boardSlice";
+import {resetGame, setLastMoveIsEnPassant, setNotice} from "@/features/board/boardSlice";
 import {removeDataInStorage} from "@/utils/storage";
-import {Board} from "@/models/Board";
 import {Cell} from "@/models/Cell";
+import {useCounters} from "@/providers/CountersProvider";
 
 interface ChessControlContextProps {
     mode: number,
@@ -23,17 +23,16 @@ interface ChessControlContextProps {
     cellSize: number;
     endGame: () => void;
     restartGame: () => void;
-    board: any;
     selectedCell: Cell | null;
     setSelectedCell: (cell: Cell | null) => void;
-    initNewBoard: () => Board;
 }
 
 const ControlContext = createContext<ChessControlContextProps>({} as ChessControlContextProps);
 
 export const ControlProvider = ({ children } : { children: React.ReactNode }) => {
 
-    const { width } = useWindowDimensions();
+    // const { width } = useWindowDimensions();
+    // Math.floor(width/8)
 
     const [mode, setMode] = useState<number>(MODE);
     const [rotate, setRotate] = useState<boolean>(ROTATE);
@@ -45,40 +44,35 @@ export const ControlProvider = ({ children } : { children: React.ReactNode }) =>
 
     const dispatch = useAppDispatch();
 
-    const board = useRef(new Board());
+    const {board, resetCounters} = useCounters();
 
     useEffect(() => {
-        setCellSize(Math.floor(width/8));
-    }, [width]);
+        setCellSize(32);
+    }, []);
 
-    async function endGame() {
-        dispatch(endGameControl());
+    async function end() {
+        dispatch(endGame());
         setCurrentPlayer(null);
         await init();
     }
 
-    async function restartGame() {
-        dispatch(restartGameControl());
+    async function restart() {
+        dispatch(restartGame());
         await init();
         setCurrentPlayer(PlayerTypes.WHITE);
-    }
-
-    function initNewBoard(): Board {
-        const newBoard = new Board();
-        newBoard.initCells();
-        newBoard.addFigures();
-        dispatch(setLastMoveIsEnPassant(false));
-        return newBoard;
     }
 
     async function init() {
         dispatch(setNotice([]));
         await removeDataInStorage(NOTES_LOCAL_STORAGE);
-        board.current = initNewBoard();
+        board.current.reset();
+        dispatch(setLastMoveIsEnPassant(false));
+        dispatch(resetGame())
+        resetCounters();
     }
 
     return (
-        <ControlContext.Provider value={{initNewBoard, selectedCell, setSelectedCell, board, endGame, restartGame, setModeWhitePlayer, setModeBlackPlayer, modeWhitePlayer, modeBlackPlayer, cellSize, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
+        <ControlContext.Provider value={{selectedCell, setSelectedCell, endGame: end, restartGame: restart, setModeWhitePlayer, setModeBlackPlayer, modeWhitePlayer, modeBlackPlayer, cellSize, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
             {children}
         </ControlContext.Provider>
     );

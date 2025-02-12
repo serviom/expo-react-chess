@@ -1,10 +1,22 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {ISelectOption, Player, SingleValue} from "@/types";
+import {Cell} from "@/models/Cell";
+import {Board} from "@/models/Board";
 
 export interface ControlState {
     start: number,
     finish: boolean,
     pause: boolean,
     analyze: boolean,
+    // TODO in future
+    // mode: number,
+    // rotate: boolean;
+    // currentPlayer: Player | null;
+    // modeWhitePlayer: SingleValue<ISelectOption>,
+    // modeBlackPlayer: SingleValue<ISelectOption>,
+    // cellSize: number;
+    // selectedCell: Cell | null;
+    // setSelectedCell: (cell: Cell | null) => void;
 }
 
 const controlInitialState: ControlState = {

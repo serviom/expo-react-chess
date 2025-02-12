@@ -1,5 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Board} from "../models/Board";
+import React, {useCallback, useEffect, useRef} from 'react';
 import CellComponent from "./CellComponent";
 import {Cell} from "../models/Cell";
 import {FenFigureSign, Figure, FigureSides, typeFenFigureSign} from "../models/figures/Figure";
@@ -10,31 +9,27 @@ import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
 import {
     BoardState,
-    resetGame, setAnalysisNotice,
-    setLastCell, setLastCodeMove,
+    resetGame,
+    setAnalysisNotice,
+    setLastCell,
+    setLastCodeMove,
     setLastMoveIsEnPassant,
     setNotice,
     setPrevCell
 } from "@/features/board/boardSlice";
 
 import {NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
-import {modePlayer, Player} from "@/types";
+import {modePlayer} from "@/types";
 import {
-    CastleTypes, changeRuleOf50Moves,
-    END_GAME,
+    changeRuleOf50Moves,
     fillMovesRecursive,
     getColorPlayerForFen,
     getEnPassantCell,
     getFenFigureSignBySymbol,
     getPruningCoordinateMove,
-    getSystemCoordinateMoveByShort,
-    isBlackMove,
-    makeCoordinateByLine, moveIsEnPassant,
-    oneAnalysisMove,
-    searchItemForAnalysisByDeep,
-    searchItemForAnalysisByDeepAndId,
-    searchItemForAnalysisById,
-    searchItemRecursiveForLast
+    makeCoordinateByLine,
+    moveIsEnPassant,
+    searchItemForAnalysisById
 } from "@/utils/board";
 import ModalComponent from "@/components/ModalComponent";
 import {useControl} from "@/providers/ControlProvider";
@@ -43,19 +38,9 @@ import {useModal} from "@/providers/ModalProvider";
 import {getBestmoveByStockfish} from "@/utils/singletons/stockfish";
 import {Queen} from "@/models/figures/Queen";
 import {Knight} from "@/models/figures/Knight";
+import {useCounters} from "@/providers/CountersProvider";
 
-export interface BoardProps {
-    // isOpenedSelectFigure: boolean;
-    // setIsOpenedSelectFigure: (state: boolean) => void;
-    // counter: number;
-    // currentMoveIsLast: () => boolean;
-    // moveOnClick: (selectedCell: Cell, targetCell: Cell, promotion: string | null) => void;
-    // myState: React.RefObject<staticRefObject>;
-    // setFigure: (FigureName: typeFenFigureSign) => void;
-    // updateBoard: () => void;
-    // selectedCell: Cell | null;
-    // setSelectedCell: (cell: Cell | null) => void;
-}
+export interface BoardProps {}
 
 export type staticRefObject = {
     targetCell: Cell | null,
@@ -77,12 +62,12 @@ const initialStaticRefObject = {
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
     const {} = props;
-
-    const {board, currentPlayer, setCurrentPlayer, modeWhitePlayer, modeBlackPlayer} = useControl();
-
+    const {rotate, cellSize, selectedCell, setSelectedCell, currentPlayer, setCurrentPlayer, modeWhitePlayer, modeBlackPlayer} = useControl();
     const boardState = useSelector((state: RootState) => state.board);
     const {start, analyze, pause} = useSelector((state: RootState) => state.control);
-    const {rotate, cellSize, selectedCell, setSelectedCell, endGame, restartGame, initNewBoard} = useControl();
+    const {board, setBoard, counterMove, ruleOf50Moves, fenReportStringCastle,
+        counterAnalysisMoveIncrease, setCounterAnalysisMoveIncrease, counterAnalysisMove, setCounterAnalysisMove,
+        setRuleOf50Moves, setCounterMove} = useCounters();
 
     const dispatch = useAppDispatch();
 
@@ -96,6 +81,9 @@ const BoardComponent = (props: BoardProps) => {
     //     }
     // }));
 
+    if(!board.current) {
+        return;
+    }
 
     useEffect(() => {
         init();
@@ -104,7 +92,7 @@ const BoardComponent = (props: BoardProps) => {
     useEffect(() => {
         if (currentPlayer) {
             board.current.highlightCells(selectedCell, currentPlayer, boardState as BoardState);
-            //updateBoard()
+            updateBoard()
         }
     }, [selectedCell]);
 
@@ -144,7 +132,9 @@ const BoardComponent = (props: BoardProps) => {
 
     async function init() {
         await clearNotice();
-        board.current = initNewBoard();
+        board.current.reset();
+        debugger
+        dispatch(setLastMoveIsEnPassant(false));
     }
 
     async function clearNotice(): Promise<void> {
@@ -153,35 +143,25 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function currentMoveIsLast(): boolean {
-        return boardState.notice.length === board.current.counterMove;
+        return boardState.notice.length === counterMove.current
     }
 
     const clickHandler = useCallback((colIndex: number, rowIndex: number): void => {
-
-        console.log('clickHandler');
-
         const targetCell = board.current.getCell(rowIndex, colIndex);
 
         if (!currentPlayer) {
             return;
         }
 
-        console.log('clickHandler2');
-
         if (selectedCell && selectedCell !== targetCell && selectedCell.figure !== null
             && board.current.playerCanMove(selectedCell, targetCell, currentPlayer)
         ) {
-            console.log('clickHandler3');
             moveOnClick(selectedCell, targetCell, null);
         } else {
-            console.log('clickHandler4');
             if (start && !currentMoveIsLast()) {
-                console.log('clickHandler5');
                 return;
             }
-
             if (targetCell.figure?.color === currentPlayer) {
-                console.log('clickHandler6');
                 setSelectedCell(targetCell);
             }
         }
@@ -196,7 +176,7 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function getAnalysisDeep() {
-        const currentMoveTree = searchItemForAnalysisById(boardState.analysis_notes, board.current.counterAnalysisMove);
+        const currentMoveTree = searchItemForAnalysisById(boardState.analysis_notes, counterAnalysisMove.current);
 
         if (!currentMoveTree) {
             throw new Error('currentMoveTree is null');
@@ -220,7 +200,7 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function moveBestMove() {
-        getBestmoveByStockfish(fen(analyze ? getAnalysisDeep() : board.current.counterMove + 1)).then((result: any) => {
+        getBestmoveByStockfish(fen(analyze ? getAnalysisDeep() : counterMove.current + 1)).then((result: any) => {
             //setBestMove(result);
         });
     }
@@ -232,13 +212,13 @@ const BoardComponent = (props: BoardProps) => {
 
         let fen = board.current.partBoardFen();
 
-        fen += ' ' + getColorPlayerForFen(currentPlayer) + ' ' + (board.current.fenReportStringCastle === '' ? '-' : board.current.fenReportStringCastle);
+        fen += ' ' + getColorPlayerForFen(currentPlayer) + ' ' + (fenReportStringCastle.current === '' ? '-' : fenReportStringCastle.current);
 
         const enPassantCell = getEnPassantCell(board.current, boardState);
 
         fen += ' ' + (enPassantCell !== null ? enPassantCell.interCoordinate : '-');
 
-        fen += ' ' + board.current.ruleOf50Moves;
+        fen += ' ' + ruleOf50Moves.current;
 
         fen += ' ' + (counterMove).toString();
 
@@ -253,7 +233,7 @@ const BoardComponent = (props: BoardProps) => {
         }
     }
 
-    function setFigure(FigureName: typeFenFigureSign) {
+    async function setFigure(FigureName: typeFenFigureSign) {
         const targetCell = myState.current.targetCell;
         const selectedCell = myState.current.selectedCell;
         const selectedFigure = myState.current.selectedFigure;
@@ -274,13 +254,12 @@ const BoardComponent = (props: BoardProps) => {
         }
 
         const lastCodeMove = getPruningCoordinateMove(boardState, selectedCell, targetCell, selectedFigure, opponentFigure);
-        wrapSaveLastCodeMove(lastCodeMove);
+        await wrapSaveLastCodeMove(lastCodeMove);
         finishMove();
     }
 
     function updateBoard() {
-        const newBoard = board.current.getCopyBoard();
-        board.current = newBoard;
+        setBoard(board.current.getCopyBoard());
     }
 
     function finishMove() {
@@ -289,8 +268,7 @@ const BoardComponent = (props: BoardProps) => {
         setSelectedCell(null);
         updateBoard();
         if (!analyze) {
-            console.log('increment');
-            board.current.counterMove++;
+            setCounterMove(counterMove.current + 1);
         }
         swapPlayer();
     }
@@ -323,7 +301,7 @@ const BoardComponent = (props: BoardProps) => {
 
         // якщо зроблений хід пішаком чи збито фігуру targetCell не була пустою
         // тоді ми обновляємо правило 50 ходів до 0
-        board.current.ruleOf50Moves = changeRuleOf50Moves(selectedCell, targetCell, board);
+        setRuleOf50Moves(changeRuleOf50Moves(selectedCell, targetCell, board))
 
         const lastCodeMove = selectedCell.moveFigure(targetCell, boardState);
 
@@ -334,7 +312,7 @@ const BoardComponent = (props: BoardProps) => {
 
         // promotion існує тільки в тому випадку якщо хід вже відомий наприклад він визначений stockfish-ом
         if (promotion) {
-            setFigure(getFenFigureSignBySymbol(promotion));
+            await setFigure(getFenFigureSignBySymbol(promotion));
             return;
         }
 
@@ -358,11 +336,11 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function saveLastAnalyzeCodeMove(codeMove: string): void {
-        board.current.counterAnalysisMoveIncrease++;
+        setCounterAnalysisMoveIncrease(counterAnalysisMoveIncrease.current + 1);
         const moveTree = JSON.parse(JSON.stringify(boardState.analysis_notes));
         console.log('moveTree', moveTree);
         const moves: string[] = [];
-        const searchObject = fillMovesRecursive(moveTree, board.current.counterAnalysisMove, moves);
+        const searchObject = fillMovesRecursive(moveTree, counterAnalysisMove.current, moves);
         if (!searchObject) {
             return;
         }
@@ -376,14 +354,14 @@ const BoardComponent = (props: BoardProps) => {
         if (virtualItem) {
             virtualItem.value = codeMove;
             dispatch(setAnalysisNotice(moveTree));
-            board.current.counterAnalysisMove = virtualItem.id;
+            setCounterAnalysisMove(virtualItem.id);
             return;
         }
 
         const isMoveInAnalysis = searchObject.children.find((item: any) => item.value === codeMove);
 
         if (isMoveInAnalysis) {
-            board.current.counterAnalysisMove = isMoveInAnalysis.id;
+            setCounterAnalysisMove(isMoveInAnalysis.id);
             return;
         }
 
@@ -392,17 +370,21 @@ const BoardComponent = (props: BoardProps) => {
             color: searchObject.color === PlayerTypes.BLACK ? PlayerTypes.WHITE : PlayerTypes.BLACK,
             deep: searchObject.deep + 1,
             index: searchObject.children.length,
-            id: board.current.counterAnalysisMoveIncrease,
+            id: counterAnalysisMoveIncrease.current,
             children: []
         });
 
         dispatch(setAnalysisNotice(moveTree));
-        board.current.counterAnalysisMove = board.current.counterAnalysisMoveIncrease;
+        setCounterAnalysisMove(counterAnalysisMoveIncrease.current)
     }
 
     function getSeconds() {
         const now = new Date();
         return now.getSeconds();
+    }
+
+    function getCells() {
+        return board.current.cells;
     }
 
     const styles = StyleSheet.create({

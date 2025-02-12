@@ -10,17 +10,9 @@ import {setPause} from "@/features/control/controlSlice";
 import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
 
-interface ControlProps {
-    // restart: () => void;
-    // endGame: () => void;
-    // showBestMove: () => void;
-    // moveBestMove: () => void;
-    //bestMove: BestMove | undefined;
-}
+interface ControlProps {}
 
-const Control: FC<ControlProps> = ({
-         // restart, endGame,
-     }: ControlProps) => {
+const Control: FC<ControlProps> = ({}: ControlProps) => {
 
     const {pause} = useSelector((state: RootState) => state.control)
     const { mode, setMode, rotate, setRotate, setModeWhitePlayer, setModeBlackPlayer,
@@ -64,7 +56,7 @@ const Control: FC<ControlProps> = ({
                 />
             </View>
 
-            <Timer />
+            {/*<Timer />*/}
 
             <View style={styles.container}>
                 <View style={styles.wrapType}>

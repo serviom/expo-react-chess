@@ -84,20 +84,21 @@ export class Board {
     cells: Cell[][] = [];
     lostBlackFigures: Figure[] = [];
     lostWhiteFigures: Figure[] = [];
-    numberOfCells: number = 8;
     blackFigures: Figure[] = [];
     whiteFigures: Figure[] = [];
-    // показує поточну позицію в дереві ходів для гри
-    counterMove: number = 0;
-    // показує поточну позицію в дереві ходів для аналізатора
-    counterAnalysisMove: number = 0;
-    // counterAnalysisMoveIncrease завжди збільшується на 1 при кожному новому кроці для аналізу
-    counterAnalysisMoveIncrease: number = 0;
-    // коли ми формуємо fen код для шахів ми передаємо строку кодування можливості рокировки
-    fenReportStringCastle: string = START_FEN_STRING_CASTLE;
-    // правило 50 ходів коли не ходять пішаком і не бють фігуру
-    ruleOf50Moves: number = 0;
 
+    numberOfCells: number = 8;
+    fenReportStringCastle: string = '';
+
+    public reset(){
+        this.cells = [];
+        this.lostBlackFigures = [];
+        this.lostWhiteFigures = [];
+        this.blackFigures = [];
+        this.whiteFigures = [];
+        this.initCells();
+        this.addFigures();
+    }
 
     public clearOpportunitiesCastleWhite() {
         this.fenReportStringCastle = this.fenReportStringCastle.replace(WHITE_SHORT_CASTLE_FEN, '');
@@ -109,7 +110,13 @@ export class Board {
         this.fenReportStringCastle = this.fenReportStringCastle.replace(BLACK_LONG_CASTLE_FEN, '');
     }
 
+    public setFenReportStringCastle(value: string) {
+        this.fenReportStringCastle = value;
+    }
 
+    public getFenReportStringCastle(): string {
+        return this.fenReportStringCastle;
+    }
 
     public changeFenReportStringCastle(codeMove: string, currentPlayer: Player | null) {
         if (this.fenReportStringCastle === '') {
@@ -162,6 +169,7 @@ export class Board {
                 }
             }
             this.cells.push(row);
+            //dispatch(setCell(row));
         }
     }
 
@@ -172,11 +180,6 @@ export class Board {
         newBoard.lostBlackFigures = this.lostBlackFigures;
         newBoard.whiteFigures = this.whiteFigures;
         newBoard.blackFigures = this.blackFigures;
-        newBoard.counterMove = this.counterMove;
-        newBoard.counterAnalysisMove = this.counterAnalysisMove;
-        newBoard.counterAnalysisMoveIncrease = this.counterAnalysisMoveIncrease;
-        newBoard.fenReportStringCastle = this.fenReportStringCastle;
-        newBoard.ruleOf50Moves = this.ruleOf50Moves;
         return newBoard;
     }
 
