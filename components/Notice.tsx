@@ -62,6 +62,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     const [isLast, setIsLast] = useState<boolean>(false);
     const [isPrev, setIsPrev] = useState<boolean>(false);
     const [isFirst, setIsFirst] = useState<boolean>(false);
+    const [step, setStep] = useState<number>(0);
 
     const dispatch = useAppDispatch();
     const {notice, analysis_notes} = useSelector((state: RootState) => state.board);
@@ -74,15 +75,12 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
     }, [start]);
 
     useEffect(() => {
-        if (!currentPlayer || !start) {
-            return;
-        }
         setIsNext(checkIsNext());
         setIsLast(checkIsLast());
         setIsPrev(checkIsPrev());
         setIsFirst(checkIsFirst());
+    }, [currentPlayer, start, step]);
 
-    }, [currentPlayer, start]);
 
     function numberOfLastMove(): number {
         return notice.length;
@@ -92,17 +90,10 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         board.current.reset();
         dispatch(setLastMoveIsEnPassant(false));
     }
-    //
-    // function initNewBoard(): Board {
-    //     const newBoard = new Board();
-    //     newBoard.initCells();
-    //     newBoard.addFigures();
-    //     dispatch(setLastMoveIsEnPassant(false));
-    //     return newBoard;
-    // }
 
     function checkIsNext() {
         if (!analyze) {
+
             return counterMove.current !== numberOfLastMove();
         }
 
@@ -246,7 +237,6 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
 
         const newStep = analyze ? getPrevAnalysisStep() : counterMove.current - 1;
 
-        console.log('prevMove newStep', newStep);
         if (newStep === 0) {
             return;
         }
@@ -266,6 +256,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
 
     function firstMove(): void {
         clearSelectedCell();
+        // для аналізу перший крок буде кроком початку розгалуження в аналізі партії
         wrapGoToStep(analyze ? getFirstAnalysisStep() : 1);
     }
 
@@ -282,7 +273,6 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
 
         const newStep = analyze ? getNextAnalysisStep() : counterMove.current + 1;
 
-        console.log('newStep', newStep);
         wrapGoToStep(newStep);
     }
 
@@ -310,8 +300,6 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
             return;
         }
 
-        console.log('board.current.counterMove', counterMove.current);
-
         //const newBoard = step < board.current.counterMove ? initNewBoard() : board.current.getCopyBoard();
 
         if (step < counterMove.current) {
@@ -328,7 +316,8 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
             }
         }
 
-        setCurrentPlayer(isBlackMove(counterMove.current) ? PlayerTypes.WHITE : PlayerTypes.BLACK);
+        setCurrentPlayer(getOppositePlayer(counterMove.current));
+        setStep(step);
     }
 
     function wrapOneMoveForNotice(codeMove: string, board: Board, isBlack: boolean): void {
@@ -374,7 +363,11 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         });
 
         setCounterAnalysisMove(step);
-        setCurrentPlayer(isBlackMove(moves.length) ? PlayerTypes.WHITE : PlayerTypes.BLACK);
+        setCurrentPlayer(getOppositePlayer(step));
+    }
+
+    function getOppositePlayer(step: number) {
+        return isBlackMove(step) ? PlayerTypes.WHITE : PlayerTypes.BLACK
     }
 
     function currentMove(step: number): boolean {
@@ -618,7 +611,6 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
             throw new Error('moveTree is null');
         }
 
-        console.log('mineLineHistory.length: ', mineLineHistory.length);
         const idLastItem = makeAdvancedMoves(clearPgnPicture, moveTree, mineLineHistory.length);
         await storeDataInStorage(NOTES_LOCAL_STORAGE, JSON.stringify(mineLineHistory));
         await storeDataInStorage(VALUE_NOTES_LOCAL_STORAGE, JSON.stringify(mineLineHistory));
@@ -629,14 +621,20 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
         loadAnalyze(idLastItem);
     }
 
+    function getSeconds() {
+        const now = new Date();
+        return now.getSeconds();
+    }
+
     return (
         <View style={styles['wrapNotice']}>
+            <Text>{getSeconds()}</Text>
             {
                 analyze && (
                     <Text>Включений аналіз партії</Text>
                 )
             }
-            <View style={styles['historyMoves']}>
+            <View style={styles.historyMoves}>
                 { !analyze && (
                     <View style={styles['mainMoves']}>
                     {
@@ -675,7 +673,7 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
                         }
                         firstMove();
                     }}>
-                        <Text>first move</Text>
+                        <Text style={styles.controlText}>first move</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -768,11 +766,13 @@ const styles = StyleSheet.create({
         opacity: 0.5
     },
     wrapControl: {
-        display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10
+        gap: 2
+    },
+    controlText: {
+
     },
     separator: {
         marginHorizontal: 10, // Відступи між роздільниками
@@ -780,19 +780,16 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     pairMoves: {
-        display: 'flex',
         flexDirection: 'row',
     },
     mainMoves: {
-        display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
         flexWrap: 'wrap',
     },
     historyMoves: {
-        display: 'flex',
-        flexWrap: 'wrap',
+
     },
     historyMovesCurrent: {
         fontWeight: 'bold',
@@ -804,7 +801,6 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
     },
     wrapPngNotice: {
-        width: 520,
     },
     current: {
         fontWeight: 'bold',

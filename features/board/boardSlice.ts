@@ -94,7 +94,8 @@ export const {
     setLastCodeMove,
     setNotice,
     setAnalysisNotice,
-    resetGame
+    resetGame,
+    setCell
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

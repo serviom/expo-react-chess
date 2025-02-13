@@ -84,7 +84,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
     }
 
     useEffect(() => {
-        // End game
         if (!start) {
             if (timer.current) {
                 clearInterval(timer.current)
@@ -92,7 +91,6 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
             clearTimeValues();
         }
 
-        // Start game
         if (start) {
             if (timer.current) {
                 clearInterval(timer.current)
@@ -111,15 +109,15 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
         dispatch(endGame());
     }
 
+
+
     return (
-            start && (
+        start > 0 &&
             <View>
                 <Text>{`Чорні - ${Math.round(blackTime/1000)} сек.`}</Text>
                 <Text>{`Білі - ${Math.round(whiteTime/1000)} сек. `}</Text>
             </View>
-        )
     )
-
 }
 
 export default Timer;

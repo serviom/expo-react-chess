@@ -42,12 +42,13 @@ export const ControlProvider = ({ children } : { children: React.ReactNode }) =>
     const [cellSize, setCellSize] = useState<number>(CELL_SIZE);
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
 
+
     const dispatch = useAppDispatch();
 
     const {board, resetCounters} = useCounters();
 
     useEffect(() => {
-        setCellSize(32);
+        setCellSize(24);
     }, []);
 
     async function end() {

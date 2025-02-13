@@ -15,7 +15,8 @@ import {
     setLastCodeMove,
     setLastMoveIsEnPassant,
     setNotice,
-    setPrevCell
+    setPrevCell,
+    setCell
 } from "@/features/board/boardSlice";
 
 import {NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
@@ -58,6 +59,7 @@ const initialStaticRefObject = {
     switchEnPassant: false
 }
 
+const NUMBER_OF_CELLS = 8;
 
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
@@ -67,7 +69,7 @@ const BoardComponent = (props: BoardProps) => {
     const {start, analyze, pause} = useSelector((state: RootState) => state.control);
     const {board, setBoard, counterMove, ruleOf50Moves, fenReportStringCastle,
         counterAnalysisMoveIncrease, setCounterAnalysisMoveIncrease, counterAnalysisMove, setCounterAnalysisMove,
-        setRuleOf50Moves, setCounterMove} = useCounters();
+        setRuleOf50Moves, setCounterMove, } = useCounters();
 
     const dispatch = useAppDispatch();
 
@@ -129,6 +131,20 @@ const BoardComponent = (props: BoardProps) => {
             }
         }
     }, [currentPlayer, start]);
+
+    function initCells() {
+        for (let i = 0; i < NUMBER_OF_CELLS; i++) {
+            const row: Cell[] = []
+            for (let j = 0; j < NUMBER_OF_CELLS; j++) {
+                if ((i + j) % 2 !== 0) {
+                    row.push(new Cell(board.current, j, i, PlayerTypes.BLACK, null))
+                } else {
+                    row.push(new Cell(board.current, j, i, PlayerTypes.WHITE, null))
+                }
+            }
+            dispatch(setCell(row));
+        }
+    }
 
     async function init() {
         await clearNotice();
@@ -274,6 +290,7 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function swapPlayer() {
+        console.log('swapPlayer currentPlayer', currentPlayer);
         setCurrentPlayer(currentPlayer === PlayerTypes.WHITE ? PlayerTypes.BLACK : PlayerTypes.WHITE);
     }
 
@@ -381,10 +398,6 @@ const BoardComponent = (props: BoardProps) => {
     function getSeconds() {
         const now = new Date();
         return now.getSeconds();
-    }
-
-    function getCells() {
-        return board.current.cells;
     }
 
     const styles = StyleSheet.create({

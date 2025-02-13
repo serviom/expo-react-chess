@@ -158,7 +158,7 @@ export class Board {
         }
     }
 
-    public initCells() {
+    initCells() {
         for (let i = 0; i < this.numberOfCells; i++) {
             const row: Cell[] = []
             for (let j = 0; j < this.numberOfCells; j++) {

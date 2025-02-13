@@ -13,7 +13,6 @@ const HomeScreen = ()=> {
 
     return (
         <ThemeChangeProvider>
-            <View>
                 <Text style={styles.text}>Home screen</Text>
                 <Link href={Route.About} style={styles.button}>
                     <Text>Go to About screen</Text>
@@ -51,7 +50,6 @@ const HomeScreen = ()=> {
                         <Text>Settings profile</Text>
                     </Link>
                 }
-            </View>
         </ThemeChangeProvider>
     );
 }

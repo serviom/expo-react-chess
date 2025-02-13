@@ -4,9 +4,7 @@ import React from "react";
 import {useTheme} from "@rneui/themed";
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-  },
+  container: {}
 });
 
 export const ThemedView = ({ children, style, ...otherProps }: ViewProps) => {
@@ -19,7 +17,6 @@ export const ThemedView = ({ children, style, ...otherProps }: ViewProps) => {
             { backgroundColor: theme.colors.background },
             style
           ]}
-
           {...otherProps}
       >
         {children}

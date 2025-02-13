@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {ISelectOption, modePlayerOptions, SingleValue} from "../../types";
 import {BestMove} from "../../utils/singletons/stockfish";
@@ -18,6 +18,8 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
     const { mode, setMode, rotate, setRotate, setModeWhitePlayer, setModeBlackPlayer,
         modeWhitePlayer, modeBlackPlayer, endGame, restartGame } = useControl();
 
+    const [bestMove, setBestMove] = useState<BestMove | undefined>(undefined);
+
     const dispatch = useAppDispatch();
 
     function changeMode(selectedMode: number) {
@@ -33,87 +35,54 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
         return now.getSeconds();
     }
 
+    function showBestMove() {
+        // getBestmoveByStockfish(fen(analyze ? getAnalysisDeep() : counterMove.current + 1)).then(() => {
+        //     setBestMove({
+        //         from: 'a2',
+        //         to: 'a3',
+        //         promotion: ''
+        //     });
+        // });
+    }
+
+    function moveBestMove() {
+        // getBestmoveByStockfish(fen(analyze ? getAnalysisDeep() : counterMove.current + 1)).then((result: any) => {
+        //     setBestMove(result);
+        // });
+    }
+
     return (
-        <View>
-            <View>
-                <Button
-                    title={'Restart game'}
-                    onPress={restartGame}
-                />
-            </View>
-
-            <View>
-                <Button
-                    title={'Start game'}
-                    onPress={restartGame}
-                />
-            </View>
-
-            <View>
-                <Button
-                    title={'End game'}
-                    onPress={endGame}
-                />
-            </View>
-
-            {/*<Timer />*/}
-
-            <View style={styles.container}>
-                <View style={styles.wrapType}>
-                    <Text style={styles.label}>Тип фігур</Text>
-                    <Text>{getSeconds()}</Text>
-                    <CheckBox
-                        title="Тип 1"
-                        checked={mode === 1}
-                        onPress={() => changeMode(1)}
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                    />
-                    <CheckBox
-                        title="Тип 2"
-                        checked={mode === 2}
-                        onPress={() => changeMode(2)}
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                    />
-                    <CheckBox
-                        title="Тип 3"
-                        checked={mode === 3}
-                        onPress={() => changeMode(3)}
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                    />
+        <View style={{ flex: 1, padding: 10 }}>
+            {/* Два стовпця */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1, paddingRight: 5 }}>
+                    <Timer />
+                    <Button title={'Restart game'} onPress={restartGame} />
+                    <Button title={'Start game'} onPress={restartGame} />
+                    <Button title={'End game'} onPress={endGame} />
                 </View>
-
-                <View style={styles.wrapType}>
-                    <CheckBox
-                        title="Обернути"
-                        checked={rotate}
-                        onPress={switchRotate}
-                    />
+                <View style={{ flex: 1, paddingLeft: 5 }}>
+                    <Text>Тип фігур</Text>
+                    <CheckBox title="Тип 1" checked={mode === 1} onPress={() => changeMode(1)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                    <CheckBox title="Тип 2" checked={mode === 2} onPress={() => changeMode(2)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                    <CheckBox title="Тип 3" checked={mode === 3} onPress={() => changeMode(3)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                    <CheckBox title="Обернути" checked={rotate} onPress={switchRotate} />
                 </View>
             </View>
 
-            <View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ marginRight: 10 }}>Mode white player</Text>
-                    <Picker
-                        selectedValue={modeWhitePlayer}
-                        onValueChange={(value) => setModeWhitePlayer(value)}
-                        style={{ height: 50, width: 150 }}
-                    >
+            {/* Рядочок */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <View style={{ flex: 1, paddingRight: 5 }}>
+                    <Text>Mode white player</Text>
+                    <Picker selectedValue={modeWhitePlayer} onValueChange={(value) => setModeWhitePlayer(value)}>
                         {modePlayerOptions.map((option) => (
                             <Picker.Item key={option.value} label={option.label} value={option.value} />
                         ))}
                     </Picker>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ marginRight: 10 }}>Mode black player</Text>
-                    <Picker
-                        selectedValue={modeBlackPlayer}
-                        onValueChange={(value) => setModeBlackPlayer(value)}
-                        style={{ height: 50, width: 150 }}
-                    >
+                <View style={{ flex: 1, paddingLeft: 5 }}>
+                    <Text>Mode black player</Text>
+                    <Picker selectedValue={modeBlackPlayer} onValueChange={(value) => setModeBlackPlayer(value)}>
                         {modePlayerOptions.map((option) => (
                             <Picker.Item key={option.value} label={option.label} value={option.value} />
                         ))}
@@ -121,31 +90,20 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
                 </View>
             </View>
 
-            {/*<View>*/}
-            {/*    <Button*/}
-            {/*        title={'Move Best Move'}*/}
-            {/*        onPress={moveBestMove}*/}
-            {/*    />*/}
-            {/*</View>*/}
-
-            {/*<View>*/}
-            {/*    <Button*/}
-            {/*        disabled={bestMove !== undefined}*/}
-            {/*        title={'Show Best Move'}*/}
-            {/*        onPress={showBestMove}*/}
-            {/*    />*/}
-            {/*    {*/}
-            {/*        bestMove !== undefined &&*/}
-            {/*        <View>*/}
-            {/*            <Text>{'From: ' + bestMove.from + ' -> ' + bestMove.to + (bestMove.promotion ? ' | promo: ' + bestMove.promotion : '')}</Text>*/}
-            {/*        </View>*/}
-            {/*    }*/}
-            {/*</View>*/}
-            <View>
-                <Button
-                    title={pause ? 'Pause on' : 'Pause off'}
-                    onPress={() => dispatch(setPause(!pause))}
-                />
+            {/* Два стовпця */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <View style={{ flex: 1, paddingRight: 5 }}>
+                    <Button title={'Move Best Move'} onPress={moveBestMove} />
+                    <Button disabled={bestMove !== undefined} title={'Show Best Move'} onPress={showBestMove} />
+                    {bestMove !== undefined && (
+                        <View>
+                            <Text>{'From: ' + bestMove.from + ' -> ' + bestMove.to + (bestMove.promotion ? ' | promo: ' + bestMove.promotion : '')}</Text>
+                        </View>
+                    )}
+                </View>
+                <View style={{ flex: 1, paddingLeft: 5 }}>
+                    <Button title={pause ? 'Pause on' : 'Pause off'} onPress={() => dispatch(setPause(!pause))} />
+                </View>
             </View>
         </View>
     );
@@ -153,16 +111,3 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
 
 export default Control;
 
-const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-    },
-    wrapType: {
-        marginBottom: 16,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: "bold",
-        marginBottom: 8,
-    },
-});

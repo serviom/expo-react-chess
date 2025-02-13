@@ -124,7 +124,14 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
       top: '1%',
       left: '5%',
       fontSize: BASE_FONT_SIZE_LINE_NUMBER * cellSize / BASE_CELL_SIZE
-    }
+    },
+    timeDebug: {
+      color: 'white',
+      position: 'absolute',
+      top: '1%',
+      right: '5%',
+      fontSize: BASE_FONT_SIZE_LINE_NUMBER * cellSize / BASE_CELL_SIZE
+    },
   }), [cellSize]);
 
   const cellStyle = useMemo(() => {
@@ -158,6 +165,11 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
     return now.getSeconds();
   }
 
+  function showTime() {
+    const now = new Date();
+    return <Text style={styles.timeDebug}>{now.getSeconds()}</Text>;
+  };
+
   return (
       <TouchableOpacity
           style={cellStyle}
@@ -165,11 +177,10 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
           activeOpacity={0.7}
       >
         <View style={styles.image_container}>
-          {/*<Text>{getSeconds()}</Text>*/}
           {/* Відображення доступної клітинки (без фігури) */}
           {available && !isFigure && <View style={styles.available} />}
           {!isFigure && showHorizontalNumberCell }
-          {!isFigure && showVerticalNumberCell}
+          {!isFigure && showTime()}
           {isFigure && (
                 <ImageBackground
                     style={styles.image_container}
@@ -181,6 +192,7 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
                     ]}>
                     {showHorizontalNumberCell}
                     {showVerticalNumberCell}
+                    {showTime()}
                 </ImageBackground>
           )}
         </View>

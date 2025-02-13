@@ -3,7 +3,7 @@
     "name": "expo-react-chess",
     "slug": "expo-react-chess",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "expo-react-chess",
     "userInterfaceStyle": "automatic",
