@@ -53,20 +53,19 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
 
     return (
         <View style={{ flex: 1, padding: 10 }}>
-            {/* Два стовпця */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={{ flex: 1, paddingRight: 5 }}>
-                    <Timer />
-                    <Button title={'Restart game'} onPress={restartGame} />
-                    <Button title={'Start game'} onPress={restartGame} />
-                    <Button title={'End game'} onPress={endGame} />
+                <View style={{ flex: 1, paddingRight: 5, gap: 2 }}>
+                    {/*<Timer />*/}
+                    <Button style={styles.button} title={'Restart game'} onPress={restartGame} />
+                    <Button style={styles.button} title={'Start game'} onPress={restartGame} />
+                    <Button style={styles.button} title={'End game'} onPress={endGame} />
+                    <CheckBox title="Обернути" checked={rotate} onPress={switchRotate} />
                 </View>
                 <View style={{ flex: 1, paddingLeft: 5 }}>
-                    <Text>Тип фігур</Text>
+                    <Text style={{textAlign: "center", fontWeight: "bold"}}>Тип фігур</Text>
                     <CheckBox title="Тип 1" checked={mode === 1} onPress={() => changeMode(1)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
                     <CheckBox title="Тип 2" checked={mode === 2} onPress={() => changeMode(2)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
                     <CheckBox title="Тип 3" checked={mode === 3} onPress={() => changeMode(3)} checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
-                    <CheckBox title="Обернути" checked={rotate} onPress={switchRotate} />
                 </View>
             </View>
 
@@ -90,11 +89,10 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
                 </View>
             </View>
 
-            {/* Два стовпця */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                <View style={{ flex: 1, paddingRight: 5 }}>
-                    <Button title={'Move Best Move'} onPress={moveBestMove} />
-                    <Button disabled={bestMove !== undefined} title={'Show Best Move'} onPress={showBestMove} />
+                <View style={{ flex: 1, paddingRight: 5, gap: 2 }}>
+                    <Button style={styles.button} title={'Move Best Move'} onPress={moveBestMove} />
+                    <Button style={styles.button} disabled={bestMove !== undefined} title={'Show Best Move'} onPress={showBestMove} />
                     {bestMove !== undefined && (
                         <View>
                             <Text>{'From: ' + bestMove.from + ' -> ' + bestMove.to + (bestMove.promotion ? ' | promo: ' + bestMove.promotion : '')}</Text>
@@ -108,6 +106,11 @@ const Control: FC<ControlProps> = ({}: ControlProps) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    button: {
+    }
+})
 
 export default Control;
 

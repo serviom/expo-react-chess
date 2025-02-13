@@ -1,5 +1,5 @@
 import React, {FC, useContext, useEffect, useRef, useState} from "react";
-import {Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import {PlayerTypes} from "@/constants";
 import {useControl} from "@/providers/ControlProvider";
 import {useSelector} from "react-redux";
@@ -109,15 +109,35 @@ const Timer: FC<TimerProps> = ({} : TimerProps) => {
         dispatch(endGame());
     }
 
-
-
     return (
         start > 0 &&
-            <View>
-                <Text>{`Чорні - ${Math.round(blackTime/1000)} сек.`}</Text>
-                <Text>{`Білі - ${Math.round(whiteTime/1000)} сек. `}</Text>
+            <View style={styles.headerText}>
+                <View>
+                    <Text style={styles.text}>{`Білі - ${Math.round(whiteTime/1000)} с. `}{ currentPlayer === PlayerTypes.WHITE && ' <='}</Text>
+                </View>
+                <View>
+                    <Text style={styles.text}>{'ХІД'}</Text>
+                </View>
+                <View>
+                    <Text style={styles.text}>{ currentPlayer === PlayerTypes.BLACK && '=> '}{`Чорні - ${Math.round(blackTime/1000)} с.`}</Text>
+                </View>
             </View>
     )
 }
+
+const styles = StyleSheet.create({
+    headerText: {
+        padding: 3,
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+    text: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
+})
+
 
 export default Timer;

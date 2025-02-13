@@ -25,10 +25,11 @@ interface CellProps {
   cellColor: Player;
   isHighlightLast: boolean;
   isHighlightPrev: boolean;
+  cellSize: number;
 }
 
-const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellColor, figureNameEn, figureColor, selected, click, rowIndex, colIndex, isEnPassantFigure, available, isFigure } : CellProps) => {
-  const { mode, rotate, cellSize } = useControl();
+const CellComponent: FC<CellProps> = ({ cellSize, isHighlightLast, isHighlightPrev, cellColor, figureNameEn, figureColor, selected, click, rowIndex, colIndex, isEnPassantFigure, available, isFigure } : CellProps) => {
+  const { mode, rotate } = useControl();
 
   const styles = useMemo(() => StyleSheet.create({
     white_mode3: {
@@ -200,7 +201,7 @@ const CellComponent: FC<CellProps> = ({ isHighlightLast, isHighlightPrev, cellCo
   );
 };
 
-export default memo(CellComponent);
+export default CellComponent;
 
 
 

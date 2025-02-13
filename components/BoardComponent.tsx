@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import CellComponent from "./CellComponent";
 import {Cell} from "../models/Cell";
 import {FenFigureSign, Figure, FigureSides, typeFenFigureSign} from "../models/figures/Figure";
 // import {PopupBoxSelectFigureComponent} from "./PopupBoxSelectFigureComponent";
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, useWindowDimensions, View} from "react-native";
 
 import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "@/features/store";
@@ -19,7 +19,7 @@ import {
     setCell
 } from "@/features/board/boardSlice";
 
-import {NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
+import {CELL_SIZE, NOTES_LOCAL_STORAGE, PlayerTypes} from "@/constants";
 import {modePlayer} from "@/types";
 import {
     changeRuleOf50Moves,
@@ -40,6 +40,7 @@ import {getBestmoveByStockfish} from "@/utils/singletons/stockfish";
 import {Queen} from "@/models/figures/Queen";
 import {Knight} from "@/models/figures/Knight";
 import {useCounters} from "@/providers/CountersProvider";
+import Timer from "@/components/Control/includes/Timer";
 
 export interface BoardProps {}
 
@@ -64,12 +65,16 @@ const NUMBER_OF_CELLS = 8;
 //const BoardComponent = forwardRef((props: BoardProps, ref) => {
 const BoardComponent = (props: BoardProps) => {
     const {} = props;
-    const {rotate, cellSize, selectedCell, setSelectedCell, currentPlayer, setCurrentPlayer, modeWhitePlayer, modeBlackPlayer} = useControl();
+
+
+    const {rotate, selectedCell, setSelectedCell, currentPlayer, setCurrentPlayer, modeWhitePlayer, modeBlackPlayer} = useControl();
     const boardState = useSelector((state: RootState) => state.board);
     const {start, analyze, pause} = useSelector((state: RootState) => state.control);
     const {board, setBoard, counterMove, ruleOf50Moves, fenReportStringCastle,
         counterAnalysisMoveIncrease, setCounterAnalysisMoveIncrease, counterAnalysisMove, setCounterAnalysisMove,
         setRuleOf50Moves, setCounterMove, } = useCounters();
+
+    const { width } = useWindowDimensions();
 
     const dispatch = useAppDispatch();
 
@@ -83,9 +88,8 @@ const BoardComponent = (props: BoardProps) => {
     //     }
     // }));
 
-    if(!board.current) {
-        return;
-    }
+
+    const cellSize = Math.floor((width - 14 )/8);
 
     useEffect(() => {
         init();
@@ -169,27 +173,29 @@ const BoardComponent = (props: BoardProps) => {
             return;
         }
 
+        // якщо вибрана клітинка і там є фігура і туди можна походити ми переходимо
         if (selectedCell && selectedCell !== targetCell && selectedCell.figure !== null
             && board.current.playerCanMove(selectedCell, targetCell, currentPlayer)
         ) {
             moveOnClick(selectedCell, targetCell, null);
-        } else {
-            if (start && !currentMoveIsLast()) {
-                return;
-            }
-            if (targetCell.figure?.color === currentPlayer) {
-                setSelectedCell(targetCell);
-            }
+            return;
         }
+
+        // якщо ігра продовжується але крок ігри не останній тому що ігрок переглядає свої ходи тоді ходити заборонено
+        if (start && !currentMoveIsLast()) {
+            return;
+        }
+
+        // якщо вибрали клітинку зі своєю фігурою тоді можна позначаємо її
+        if (targetCell.figure?.color === currentPlayer) {
+            setSelectedCell(targetCell);
+        }
+
     }, [selectedCell, currentPlayer, start, board]);
 
     // function getPlayerStatus_old(): string {
     //     return analyze && currentPlayer === PlayerTypes.WHITE || !analyze && counter % 2 === 0 ? 'Хід білих' : 'Хід чорних';
     // }
-
-    function getPlayerStatus(): string {
-        return currentPlayer === PlayerTypes.WHITE ? 'Хід білих' : 'Хід чорних';
-    }
 
     function getAnalysisDeep() {
         const currentMoveTree = searchItemForAnalysisById(boardState.analysis_notes, counterAnalysisMove.current);
@@ -290,7 +296,6 @@ const BoardComponent = (props: BoardProps) => {
     }
 
     function swapPlayer() {
-        console.log('swapPlayer currentPlayer', currentPlayer);
         setCurrentPlayer(currentPlayer === PlayerTypes.WHITE ? PlayerTypes.BLACK : PlayerTypes.WHITE);
     }
 
@@ -400,7 +405,7 @@ const BoardComponent = (props: BoardProps) => {
         return now.getSeconds();
     }
 
-    const styles = StyleSheet.create({
+    const styles = useMemo(() => StyleSheet.create({
         wrapperPlayPlace: {
             flex: 1,
             alignItems: 'center',
@@ -409,32 +414,18 @@ const BoardComponent = (props: BoardProps) => {
             textAlign: 'center',
             marginBottom: 10,
         },
-        headerText: {
-            fontSize: 20,
-            fontWeight: 'bold',
-        },
         playPlace: {
             flexDirection: 'row',
-            width: "100%",
+            width: cellSize * 8,
+            height: cellSize * 8
         },
         rotate180: {
             transform: [{ rotate: '180deg' }],
         },
-        markingVert: {
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        markingHorWrap: {
-            flexDirection: 'column',
-        },
-        markingHor: {
-            flexDirection: 'row',
-        },
         wrapBoard: {
             flexDirection: 'row',
             justifyContent: 'flex-start',
-            width: cellSize * 8,
-            height: cellSize * 8,
+            width: "100%",
         },
         board: {
             flexDirection: 'column',
@@ -442,7 +433,8 @@ const BoardComponent = (props: BoardProps) => {
         wrapCell: {
             flexDirection: 'row',
         }
-    });
+    }), [cellSize]);
+
 
     return (
         <View style={styles.wrapperPlayPlace}>
@@ -450,7 +442,7 @@ const BoardComponent = (props: BoardProps) => {
             <ModalComponent />
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerText}>{getPlayerStatus()}</Text>
+                <Timer />
             </View>
             {/* Play Place */}
             <View style={[styles.playPlace, rotate && styles.rotate180]}>
@@ -460,6 +452,7 @@ const BoardComponent = (props: BoardProps) => {
                             <View key={`col-${colIndex}`} style={styles.wrapCell}>
                                 {row.map((cell: any, rowIndex: any) => (
                                     <CellComponent
+                                        cellSize={cellSize}
                                         isHighlightPrev={boardState.prevCell !== null &&
                                             cell.coordinateByLine === makeCoordinateByLine(boardState.prevCell.x, boardState.prevCell.y)}
                                         isHighlightLast={boardState.lastCell !== null &&

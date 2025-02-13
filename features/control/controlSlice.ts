@@ -14,7 +14,6 @@ export interface ControlState {
     // currentPlayer: Player | null;
     // modeWhitePlayer: SingleValue<ISelectOption>,
     // modeBlackPlayer: SingleValue<ISelectOption>,
-    // cellSize: number;
     // selectedCell: Cell | null;
     // setSelectedCell: (cell: Cell | null) => void;
 }

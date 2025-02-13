@@ -38,13 +38,6 @@ export const modePlayerOptions: ISelectOption[] = [
 //export type Player = ValueOf<typeof Players>;
 export type Player = (typeof PlayerTypes)[keyof typeof PlayerTypes];
 
-// export interface chessContextType {
-//     mode: number;
-//     currentPlayer: Player | null;
-//     rotate: boolean;
-//     cellSize: number;
-// }
-
 export interface CellInfo {
     readonly x: number;
     readonly y: number;

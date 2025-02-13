@@ -20,7 +20,6 @@ interface ChessControlContextProps {
     modeBlackPlayer: SingleValue<ISelectOption>,
     setModeWhitePlayer: (val: SingleValue<ISelectOption>) => void,
     setModeBlackPlayer: (val: SingleValue<ISelectOption>) => void,
-    cellSize: number;
     endGame: () => void;
     restartGame: () => void;
     selectedCell: Cell | null;
@@ -30,26 +29,16 @@ interface ChessControlContextProps {
 const ControlContext = createContext<ChessControlContextProps>({} as ChessControlContextProps);
 
 export const ControlProvider = ({ children } : { children: React.ReactNode }) => {
-
-    // const { width } = useWindowDimensions();
-    // Math.floor(width/8)
-
+    const { width } = useWindowDimensions();
     const [mode, setMode] = useState<number>(MODE);
     const [rotate, setRotate] = useState<boolean>(ROTATE);
     const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
     const [modeWhitePlayer, setModeWhitePlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
     const [modeBlackPlayer, setModeBlackPlayer] = useState<SingleValue<ISelectOption>>(initialStateModePlayerOptions);
-    const [cellSize, setCellSize] = useState<number>(CELL_SIZE);
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
 
-
     const dispatch = useAppDispatch();
-
     const {board, resetCounters} = useCounters();
-
-    useEffect(() => {
-        setCellSize(24);
-    }, []);
 
     async function end() {
         dispatch(endGame());
@@ -73,7 +62,7 @@ export const ControlProvider = ({ children } : { children: React.ReactNode }) =>
     }
 
     return (
-        <ControlContext.Provider value={{selectedCell, setSelectedCell, endGame: end, restartGame: restart, setModeWhitePlayer, setModeBlackPlayer, modeWhitePlayer, modeBlackPlayer, cellSize, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
+        <ControlContext.Provider value={{selectedCell, setSelectedCell, endGame: end, restartGame: restart, setModeWhitePlayer, setModeBlackPlayer, modeWhitePlayer, modeBlackPlayer, mode, setMode, rotate, setRotate, currentPlayer, setCurrentPlayer}}>
             {children}
         </ControlContext.Provider>
     );

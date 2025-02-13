@@ -634,13 +634,39 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
                     <Text>Включений аналіз партії</Text>
                 )
             }
+
+            { !start &&
+                <View style={[]}>
+                    <View>
+                        <Input
+                            style={styles.textarea}
+                            multiline={true}
+                            numberOfLines={4}
+                            value={pgn}
+                            onChangeText={setPgn}
+                        />
+                    </View>
+                    <View style={{paddingLeft: 10, paddingRight: 10}}>
+                        <Button
+                            title={'Load game'}
+                            disabled={false}
+                            onPress={async (e) => {
+                                setAnalyze(true);
+                                setStart();
+                                await loadGameFromPngHistory();
+                            }}
+                        />
+                    </View>
+                </View>
+            }
+
             <View style={styles.historyMoves}>
                 { !analyze && (
-                    <View style={styles['mainMoves']}>
+                    <View style={styles.mainMoves}>
                     {
                         notice.map((codeMove: string, index: number) => {
                             return (
-                                <View key={'notice-fragment' + index} style={styles['pairMoves']}>
+                                <View key={'notice-fragment' + index} style={styles.pairMoves}>
                                     {
                                     (index + 1) % 2 !== 0 ? (
                                         <Text style={{fontWeight: 'bold'}}>{Math.ceil((index + 1) / 2) + '. '}</Text>
@@ -717,39 +743,12 @@ const Notice: FC<NoticeProps> = ({}:NoticeProps) => {
                 </View>
             </View>
 
-            { !start &&
-                <View style={[styles.wrapPngNotice, styles.containerTextarea]}>
-                    <View>
-                        <Input
-                            style={styles.textarea}
-                            multiline={true}
-                            numberOfLines={4}
-                            value={pgn}
-                            onChangeText={setPgn}
-                        />
-                    </View>
-                    <View>
-                        <Button
-                            title={'Load game'}
-                            disabled={false}
-                            onPress={async (e) => {
-                                setAnalyze(true);
-                                setStart();
-                                await loadGameFromPngHistory();
-                            }}
-                        />
-                    </View>
-                </View>
-            }
+
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    containerTextarea: {
-        flex: 1,
-        padding: 20,
-    },
     textarea: {
         height: 100, // Аналог `rows={10}`
         width: 100,
@@ -772,12 +771,12 @@ const styles = StyleSheet.create({
         gap: 2
     },
     controlText: {
-
+        // color: 'yellow'
     },
     separator: {
-        marginHorizontal: 10, // Відступи між роздільниками
+        marginHorizontal: 4, // Відступи між роздільниками
         fontSize: 18,
-        color: '#333',
+        color: 'blue',
     },
     pairMoves: {
         flexDirection: 'row',
@@ -799,8 +798,6 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingTop: 5,
         paddingBottom: 5,
-    },
-    wrapPngNotice: {
     },
     current: {
         fontWeight: 'bold',

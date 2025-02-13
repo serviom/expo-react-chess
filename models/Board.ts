@@ -169,7 +169,6 @@ export class Board {
                 }
             }
             this.cells.push(row);
-            //dispatch(setCell(row));
         }
     }
 

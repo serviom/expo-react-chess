@@ -7,7 +7,6 @@ import {ThemedView} from "@/components/ThemedView";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import {ModalProvider} from "@/providers/ModalProvider";
 import * as ScreenOrientation from "expo-screen-orientation";
-import {calculateInputHeight} from "react-native-paper/lib/typescript/components/TextInput/helpers";
 const scale = PixelRatio.get();
 
 type styleProps = {
@@ -15,16 +14,12 @@ type styleProps = {
 };
 
 const HEIGHT_BLOCKS = 28;
-const PADDING = 5;
-const BORDER = 1;
+export const PADDING = 5;
+export const BORDER = 1;
 
 export const ThemeChangeProvider = ({ children }: { children?: React.ReactNode })=> {
-
     const { mode, setMode } = useThemeMode();
-    const { width, height } = useWindowDimensions();
-
     const [heightThemedView, setHeightThemedView] = useState<number>(HEIGHT_BLOCKS);
-
     const themeStyles = makeThemeStyles({mode});
 
     const toggleSwitch = () => {
